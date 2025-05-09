@@ -1,40 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Submit Complaint</title>
-    <link rel="stylesheet" href="/path/to/your/css/styles.css">
+    <!-- Bootstrap CSS -->
+    <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1;
+        }
+    </style>
 </head>
+
 <body>
     <%- include('partials/header') %>
 
-    <h1>Submit Complaint</h1>
+        <div class="container mt-4">
+            <h1 class="text-center">Submit Complaint</h1>
 
-    <form action="/consumer/submit-complaint" method="POST">
-        <div>
-            <label for="consumerId">Consumer ID:</label>
-            <input type="text" id="consumerId" name="consumerId" value="<%= consumerId %>" readonly>
+            <form action="/consumer/submit-complaint" method="POST" class="mt-4">
+                <div class="mb-3">
+                    <label for="consumerId" class="form-label" hidden>Consumer ID:</label>
+                    <input type="text" id="consumerId" name="consumerId" class="form-control" value="<%= consumerId %>"
+                        hidden>
+                </div>
+                <div class="mb-3">
+                    <label for="companyId" class="form-label">Company:</label>
+                    <select id="companyId" name="companyId" class="form-select" required>
+                        <% companies.forEach(company=> { %>
+                            <option value="<%= company.userId %>">
+                                <%= company._id %>
+                            </option>
+                            <% }); %>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="title" class="form-label">Title:</label>
+                    <input type="text" id="title" name="title" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description:</label>
+                    <textarea id="description" name="description" class="form-control" rows="4" required></textarea>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <button type="submit" class="btn btn-primary">Submit Complaint</button>
+                    <button type="button" class="btn btn-secondary" onclick="window.history.back();">Cancel</button>
+                </div>
+            </form>
         </div>
-        <div>
-            <label for="companyId">Company:</label>
-            <select id="companyId" name="companyId" required>
-                <% companies.forEach(company => { %>
-                    <option value="<%= company.userId %>"><%= company._id %></option>
-                <% }); %>
-            </select>
-        </div>
-        <div>
-            <label for="title">Title:</label>
-            <input type="text" id="title" name="title" required>
-        </div>
-        <div>
-            <label for="description">Description:</label>
-            <textarea id="description" name="description" required></textarea>
-        </div>
-        <button type="submit">Submit Complaint</button>
-    </form>
 
-    <%- include('partials/footer') %>
+        <%- include('partials/footer') %>
 </body>
+
 </html>
