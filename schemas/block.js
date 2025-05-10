@@ -1,7 +1,7 @@
 // models/block.js
 const mongoose = require('mongoose');
 
-const blockSchema = new mongoose.Schema({
+const block = new mongoose.Schema({
   index: { type: Number, required: true },
   timestamp: { type: Date, required: true },
   data: { type: mongoose.Schema.Types.Mixed, required: true },
@@ -9,4 +9,4 @@ const blockSchema = new mongoose.Schema({
   hash: { type: String, required: true }
 });
 
-module.exports = mongoose.model('Block', blockSchema);  // Make sure to export the model correctly
+module.exports = block;  // Make sure to export the model correctly

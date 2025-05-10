@@ -1,3 +1,4 @@
+
 const mongoose = require('mongoose');
 
 const productSchema = new mongoose.Schema({
@@ -17,6 +18,11 @@ const productSchema = new mongoose.Schema({
         type: Number,  // Price the company pays for the product
         required: true
     },
+    companyId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
     createdAt: {
         type: Date,
         default: Date.now
@@ -27,5 +33,4 @@ const productSchema = new mongoose.Schema({
     }
 });
 
-// export the schema
-module.exports = mongoose.model('Product', productSchema);
+module.exports = productSchema;

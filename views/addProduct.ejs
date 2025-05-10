@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product</title>
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+    <style>
+        html, body {
+            height: 100%;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+        main {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/header') %>
+
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Add Product</h1>
+
+        <form action="/product/create" method="POST" class="needs-validation" novalidate>
+            <div class="mb-3">
+                <label for="productName" class="form-label">Product Name:</label>
+                <input type="text" id="productName" name="productName" class="form-control" required>
+                <div class="invalid-feedback">Please enter a product name.</div>
+            </div>
+            <div class="mb-3">
+                <label for="manufacturer" class="form-label">Manufacturer:</label>
+                <input type="text" id="manufacturer" name="manufacturer" class="form-control" required>
+                <div class="invalid-feedback">Please enter the manufacturer name.</div>
+            </div>
+            <div class="mb-3">
+                <label for="basePrice" class="form-label">Base Price:</label>
+                <input type="number" id="basePrice" name="basePrice" class="form-control" required>
+                <div class="invalid-feedback">Please enter the base price.</div>
+            </div>
+            <div class="d-flex justify-content-between">
+                <button type="submit" class="btn btn-primary">Add Product</button>
+                <button type="button" class="btn btn-secondary" onclick="window.history.back();">Cancel</button>
+            </div>
+        </form>
+    </div>
+
+    <%- include('partials/footer') %>
+</body>
+</html>

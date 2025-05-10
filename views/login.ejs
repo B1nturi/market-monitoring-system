@@ -4,25 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link rel="stylesheet" href="/path/to/your/styles.css"> <!-- Add your stylesheet path here -->
+    <!-- Use Bootstrap CSS from node_modules -->
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+    <style>
+        html, body {
+            height: 100%;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+        main {
+            flex: 1;
+        }
+    </style>
 </head>
 <body>
-    <div class="login-container">
-        <h2>Login</h2>
-        <form action="./login" method="POST">
-            <div class="form-group">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required>
+    <%- include('partials/header') %>
+    <main>
+        <div class="container mt-5">
+            <div class="row justify-content-center">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header text-center">
+                            <h2>Login</h2>
+                        </div>
+                        <div class="card-body">
+                            <form action="./login" method="POST">
+                                <div class="mb-3">
+                                    <label for="username" class="form-label">Username:</label>
+                                    <input type="text" id="username" name="username" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="password" class="form-label">Password:</label>
+                                    <input type="password" id="password" name="password" class="form-control" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">Login</button>
+                            </form>
+                            <% if (typeof error !== 'undefined') { %>
+                                <p class="text-danger text-center mt-3"><%= error %></p>
+                            <% } %>
+                        </div>
+                        <div class="card-footer text-center">
+                            <p>Don't have an account?</p>
+                            <a href="/user/signup" class="btn btn-secondary w-100">Sign Up</a>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
-            </div>
-            <button type="submit">Login</button>
-        </form>
-        <% if (typeof error !== 'undefined') { %>
-            <p class="error"><%= error %></p>
-        <% } %>
-    </div>
+        </div>
+    </main>
+    <%- include('partials/footer') %>
 </body>
 </html>

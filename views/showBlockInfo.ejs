@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Block Information</title>
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+</head>
+<body>
+    <%- include('partials/header') %>
+
+    <main class="container mt-5">
+        <!-- Blocks Section -->
+        <h2 class="text-center mb-4">Blockchain Information</h2>
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Index</th>
+                        <th>Timestamp</th>
+                        <th>Data</th>
+                        <th>Previous Hash</th>
+                        <th>Hash</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% blocks.forEach(block => { %>
+                        <tr>
+                            <td><%= block.index %></td>
+                            <td><%= new Date(block.timestamp).toLocaleString() %></td>
+                            <td>
+                                <table class="table table-sm">
+                                    <tbody>
+                                        <% Object.keys(block.data).forEach(key => { %>
+                                            <tr>
+                                                <td><strong><%= key %>:</strong></td>
+                                                <td><%= block.data[key] %></td>
+                                            </tr>
+                                        <% }) %>
+                                    </tbody>
+                                </table>
+                            </td>
+                            <td><%= block.previousHash %></td>
+                            <td><%= block.hash %></td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <%- include('partials/footer') %>
+</body>
+</html>

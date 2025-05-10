@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company Dashboard</title>
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+    <style>
+        html, body {
+            height: 100%;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+        main {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/header') %>
+
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Company Dashboard</h1>
+
+        <!-- Company Details Section -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2>Company Details</h2>
+            </div>
+            <div class="card-body">
+                <p><strong>Name:</strong> <%= company.companyDetails.name %></p>
+                <p><strong>Address:</strong> <%= company.companyDetails.address %></p>
+                <p><strong>Website:</strong> <%= company.companyDetails.website %></p>
+            </div>
+        </div>
+
+        <!-- Products Section -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2>Products</h2>
+            </div>
+            <div class="card-body">
+                <% if (products.length > 0) { %>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Product Name</th>
+                                    <th>Origin</th>
+                                    <th>Base Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% products.forEach(product => { %>
+                                    <tr>
+                                        <td><%= product.productName %></td>
+                                        <td><%= product.manufacturer %></td>
+                                        <td><%= product.basePrice %></td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                <% } else { %>
+                    <p class="text-muted">No products available.</p>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="d-flex justify-content-start">
+            <a href="/product/add" class="btn btn-secondary me-2">Add Product</a>
+            <a href="/company/submit-product" class="btn btn-secondary">Handover Product</a>
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>
+</body>
+</html>

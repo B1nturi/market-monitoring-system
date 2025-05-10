@@ -8,6 +8,11 @@ const userSchema = require('../schemas/userSchema');
 // Correct way to define the model
 const User = mongoose.model('User', userSchema);
 
+// Render signup page
+router.get('/signup', (req, res) => {
+    res.render('signup');
+});
+
 // Signup
 router.post('/signup', async (req, res) => {
     try {
@@ -38,7 +43,6 @@ router.get('/login', (req, res) => {
 // Login
 router.post('/login', async (req, res) => {
     try {
-        console.log(req.body);
         const user = await User.findOne({ username: req.body.username });
         //console.log(user);
         if (!user) {
@@ -50,7 +54,7 @@ router.post('/login', async (req, res) => {
             
             // Redirect based on user role
             if (user.role === 'admin') {
-                res.redirect('/admin/companies');
+                res.redirect('/admin/dashboard');
             } else if (user.role === 'company') {
                 res.redirect('/company/dashboard');
             } else if (user.role === 'consumer') {
@@ -64,6 +68,12 @@ router.post('/login', async (req, res) => {
     } catch (err) {
         res.status(500).render('login', { error: "There was an error while logging in" });
     }
+});
+
+// Logout
+router.get('/logout', (req, res) => {
+    res.clearCookie('token');
+    res.redirect('/user/login');
 });
 
 // Get all users

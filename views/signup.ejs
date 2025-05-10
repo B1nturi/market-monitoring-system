@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup</title>
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+    <style>
+        html, body {
+            height: 100%;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+        main {
+            flex: 1;
+        }
+        .toggle-eye {
+            cursor: pointer;
+            background: none;
+            border: none;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/header') %>
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header text-center">
+                        <h2>Signup</h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="signupForm" action="/user/signup" method="POST" class="needs-validation" novalidate>
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Name:</label>
+                                <input type="text" id="name" name="name" class="form-control" required>
+                                <div class="invalid-feedback">Please enter your name.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Username:</label>
+                                <input type="text" id="username" name="username" class="form-control" required>
+                                <div class="invalid-feedback">Please enter a username.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email:</label>
+                                <input type="email" id="email" name="email" class="form-control" required>
+                                <div class="invalid-feedback">Please enter a valid email address.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password:</label>
+                                <div class="input-group">
+                                    <input type="password" id="password" name="password" class="form-control" required>
+                                    <button type="button" class="btn btn-outline-secondary toggle-eye" onclick="togglePassword('password', this)">👁️</button>
+                                </div>
+                                <div class="invalid-feedback">Please enter a password.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="confirmPassword" class="form-label">Confirm Password:</label>
+                                <div class="input-group">
+                                    <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" required>
+                                    <button type="button" class="btn btn-outline-secondary toggle-eye" onclick="togglePassword('confirmPassword', this)">👁️</button>
+                                </div>
+                                <div class="invalid-feedback">Please confirm your password.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="role" class="form-label">Role:</label>
+                                <select id="role" name="role" class="form-select" required onchange="toggleCompanyFields()">
+                                    <option value="consumer">Consumer</option>
+                                    <option value="company">Company</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                                <div class="invalid-feedback">Please select a role.</div>
+                            </div>
+                            <!-- Company Specific Fields -->
+                            <div id="company-fields" style="display: none;">
+                                <div class="mb-3">
+                                    <label for="companyName" class="form-label">Company Name:</label>
+                                    <input type="text" id="companyName" name="companyDetails[name]" class="form-control">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="registrationNumber" class="form-label">Registration Number:</label>
+                                    <input type="text" id="registrationNumber" name="companyDetails[registrationNumber]" class="form-control">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="companyAddress" class="form-label">Address:</label>
+                                    <input type="text" id="companyAddress" name="companyDetails[address]" class="form-control">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="companyWebsite" class="form-label">Website:</label>
+                                    <input type="url" id="companyWebsite" name="companyDetails[website]" class="form-control">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Signup</button>
+                        </form>
+                        <% if (typeof error !== 'undefined') { %>
+                            <p class="text-danger text-center mt-3"><%= error %></p>
+                        <% } %>
+                    </div>
+                    <div class="card-footer text-center">
+                        <p>Already have an account?</p>
+                        <a href="/user/login" class="btn btn-secondary w-100">Login</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>
+    <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleCompanyFields() {
+            const roleSelect = document.getElementById('role');
+            const companyFields = document.getElementById('company-fields');
+            if (roleSelect.value === 'company') {
+                companyFields.style.display = 'block';
+                document.getElementById('companyName').required = true;
+                document.getElementById('registrationNumber').required = true;
+                document.getElementById('companyAddress').required = true;
+            } else {
+                companyFields.style.display = 'none';
+                document.getElementById('companyName').required = false;
+                document.getElementById('registrationNumber').required = false;
+                document.getElementById('companyAddress').required = false;
+            }
+        }
+
+        function togglePassword(fieldId, btn) {
+            const input = document.getElementById(fieldId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                btn.textContent = '🙈';
+            } else {
+                input.type = 'password';
+                btn.textContent = '👁️';
+            }
+        }
+
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                alert('Passwords do not match!');
+            }
+        });
+    </script>
+</body>
+</html>
