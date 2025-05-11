@@ -8,6 +8,10 @@ const product = require('../schemas/productSchema');
 const Blockchain = require('../blockchain');
 const { authenticateCompany } = require('../middlewares/authMiddleware');
 const block = require('../schemas/block');
+const { ethers } = require("ethers");
+const abi = require("../public/json/abi.json");
+const dotenv = require("dotenv");
+dotenv.config();
 
 // Assuming you've already created a model for company data.
 const ProductMetrics = mongoose.model('ProductMetric', productMetricsSchema);
@@ -18,7 +22,7 @@ const Block = mongoose.model('Block', block);
 // Helper function to generate product ID
 const generateProductID = (companyID, productName, batchNumber) => {
     const cleanName = productName.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
-    
+
     return `'${companyID}'-'${batchNumber}'-'${cleanName}'`;
 };
 
@@ -41,48 +45,69 @@ router.get('/dashboard', authenticateCompany, async (req, res) => {
     }
 });
 
-// Example Express route
-router.get('/submit-product', async (req, res) => {
-    // Fetch data here from your respective DB model collections
-
+router.get('/submit-product', authenticateCompany, async (req, res) => {
     const decoded = jwt.verify(req.cookies.token, process.env.JWT_SECRET);
     const companyId = decoded.userId;
-    const products = await Product.find({ companyId });
-    // console.log(products);
 
-    // Fetch unique company names along with their user IDs
-    const toCompanies = await User.aggregate([
-        { $match: { role: 'company' } },
-        { $group: { _id: "$companyDetails.name", userId: { $first: "$_id" } } }
-    ]);
+    // load all companies (except the current one) with their nested wallet
+    const companies = await User
+        .find({ role: 'company', _id: { $ne: companyId } })
+        .select('companyDetails.walletaddress')   // pull only the nested field
+        .lean();
 
-    res.render('productMetricsForm', { companyId, products, toCompanies });
+    // map into the shape your EJS expects
+    const toCompanies = companies.map(c => ({
+        userId: c._id.toString(),
+        walletaddress: c.companyDetails.walletaddress
+    }));
+
+    res.render('productMetricsForm', {
+        companyId,
+        products: await Product.find({ companyId }).lean(),
+        toCompanies,
+        contractAddress: process.env.CONTRACT_ADDRESS,
+        abi: JSON.stringify(require('../public/json/abi.json'))
+    });
 });
 
-// Create a new product submission (Company only)
+// POST – expect transactionHash, verify it succeeded on‐chain first
 router.post('/submit-product', authenticateCompany, async (req, res) => {
+    console.log("=== /submit-product form data ===");
+    Object.entries(req.body).forEach(([key, value]) => {
+        console.log(`${key}:`, value);
+    });
     try {
-        const { companyId, productID, productOrigin, toCompany, sellingPrice, quantityBought } = req.body;
+        const {
+            companyId,
+            productID,
+            productOrigin,
+            toCompany,
+            sellingPrice,
+            quantityBought,
+            transactionHash
+        } = req.body;
 
-        if (!companyId || !productID || !toCompany || !sellingPrice || !quantityBought) {
-            return res.status(400).json({ error: 'Missing required fields' });
+        // 1) Ensure transactionHash is present (or remove this check if you don't care)
+        if (!transactionHash) {
+            return res.status(400).json({ error: 'Missing transactionHash' });
         }
 
-        // Ensure that the company is submitting data for their own company
-        if (req.user.userId.toString() !== companyId.toString()) {
-            return res.status(403).json({ error: 'You can only submit data for your own company.' });
-        }
-
-        // Fetch the product details using the productID
-        const product = await Product.findOne({ productID });
-
+        // 2) Load the Product so you can read its productName & batchNumber
+        const product = await Product.findOne({ productID }).lean();
         if (!product) {
             return res.status(404).json({ error: 'Product not found' });
         }
 
-        // Generate unique product ID
-        const newProductID = generateProductID(toCompany, product.productName, product.batchNumber);
 
+        // 3) Generate your composite product ID
+        const newProductID = generateProductID(
+            toCompany,
+            product.productName,
+            product.batchNumber
+        );
+
+
+        // 4) Save ProductMetrics
         const newProductMetrics = new ProductMetrics({
             companyId,
             productID,
@@ -91,6 +116,10 @@ router.post('/submit-product', authenticateCompany, async (req, res) => {
             sellingPrice,
             quantityBought
         });
+        await newProductMetrics.save();
+
+
+        // 5) Save the actual Product record under the new ID
 
         const newProduct = new Product({
             productID: newProductID,
@@ -101,20 +130,18 @@ router.post('/submit-product', authenticateCompany, async (req, res) => {
             quantity: quantityBought,
             companyId: toCompany
         });
-
-        await newProductMetrics.save();
         await newProduct.save();
-
-        const blockchain = new Blockchain();
-        const lastBlock = await Block.findOne().sort({ index: -1 });
-        const newIndex = lastBlock ? lastBlock.index + 1 : 0;
+        const blockchain = req.app.locals.blockchain;
 
         await blockchain.addBlock(newProduct);
 
-        res.status(201).json({ message: 'Product submitted successfully' });
+
+
+
+        res.json({ message: 'Saved on-chain & in DB' });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Error while submitting product' });
+        res.status(500).json({ error: 'Server error' });
     }
 });
 
