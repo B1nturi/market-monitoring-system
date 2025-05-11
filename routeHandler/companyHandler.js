@@ -72,13 +72,16 @@ router.post('/submit-product', authenticateCompany, async (req, res) => {
         if (req.user.userId.toString() !== companyId.toString()) {
             return res.status(403).json({ error: 'You can only submit data for your own company.' });
         }
-        
+
         // Fetch the product details using the productID
-        const product = await Product.find({ productID });
+        const product = await Product.findOne({ productID });
+
+        if (!product) {
+            return res.status(404).json({ error: 'Product not found' });
+        }
 
         // Generate unique product ID
-        const newProductID = generateProductID(toCompany, productName, batchNumber);
-        console.log(productID);
+        const newProductID = generateProductID(toCompany, product.productName, product.batchNumber);
 
         const newProductMetrics = new ProductMetrics({
             companyId,
@@ -89,7 +92,7 @@ router.post('/submit-product', authenticateCompany, async (req, res) => {
             quantityBought
         });
 
-         const newProduct = new Product({
+        const newProduct = new Product({
             productID: newProductID,
             productName: product.productName,
             batchNumber: product.batchNumber,
@@ -103,15 +106,9 @@ router.post('/submit-product', authenticateCompany, async (req, res) => {
         await newProduct.save();
 
         const blockchain = new Blockchain();
-        // Get the last block from the database
-        const lastBlock = await Block.findOne().sort({ index: -1 }); // Get the block with the highest index
-
-        // If no blocks exist (in case of a fresh start), set the index to 0
+        const lastBlock = await Block.findOne().sort({ index: -1 });
         const newIndex = lastBlock ? lastBlock.index + 1 : 0;
 
-        // Create a new block with the necessary fields
-        
-        // Add the new product data to the blockchain
         await blockchain.addBlock(newProduct);
 
         res.status(201).json({ message: 'Product submitted successfully' });
