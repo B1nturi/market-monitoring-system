@@ -1,59 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <!-- Use Bootstrap CSS from node_modules -->
+    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
     <style>
-        html, body {
-            height: 100%;
-        }
         body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, rgba(237, 242, 247, 0.95), rgba(226, 232, 240, 0.9)),
+                        url('https://i.ibb.co/Hp3FJrp6/logo-of-bagladeshi-brands.png');
+            background-size: contain;
+            background-position: center;
+            background-repeat: repeat-x;
+
+            height: 100vh;
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
-        main {
-            flex: 1;
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            padding: 2rem;
+            background: linear-gradient(135deg, #ffffff, #f9fafb);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+        }
+
+        .card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: none;
+        }
+
+        .card-header {
+            background-color: #ffffff;
+            border-bottom: none;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .form-control {
+            border-radius: 10px;
+            border: 1px solid #cbd5e0;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #3182ce;
+            box-shadow: 0 0 8px rgba(49, 130, 206, 0.5);
+        }
+
+        .btn-primary {
+            background-color: #3182ce;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2b6cb0;
+            transform: translateY(-2px);
+        }
+
+        .signup-link {
+            color: #3182ce;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .signup-link:hover {
+            text-decoration: underline;
+        }
+
+        .text-danger {
+            font-size: 0.9rem;
         }
     </style>
 </head>
+
 <body>
-    <%- include('partials/header') %>
-    <main>
-        <div class="container mt-5">
-            <div class="row justify-content-center">
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-header text-center">
-                            <h2>Login</h2>
-                        </div>
-                        <div class="card-body">
-                            <form action="./login" method="POST">
-                                <div class="mb-3">
-                                    <label for="username" class="form-label">Username:</label>
-                                    <input type="text" id="username" name="username" class="form-control" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="password" class="form-label">Password:</label>
-                                    <input type="password" id="password" name="password" class="form-control" required>
-                                </div>
-                                <button type="submit" class="btn btn-primary w-100">Login</button>
-                            </form>
-                            <% if (typeof error !== 'undefined') { %>
-                                <p class="text-danger text-center mt-3"><%= error %></p>
-                            <% } %>
-                        </div>
-                        <div class="card-footer text-center">
-                            <p>Don't have an account?</p>
-                            <a href="/user/signup" class="btn btn-secondary w-100">Sign Up</a>
-                        </div>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                Market Monitoring System
+            </div>
+            <div class="card-body">
+                <form action="./login" method="POST">
+                    <div class="mb-3">
+                        <input type="text" id="username" name="username" class="form-control" placeholder="Username" required>
                     </div>
-                </div>
+                    <div class="mb-3">
+                        <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Login</button>
+                </form>
+                <% if (typeof error !== 'undefined') { %>
+                    <p class="text-danger text-center mt-3"><%= error %></p>
+                <% } %>
+            </div>
+            <div class="card-footer text-center bg-light">
+                <p class="mb-0">Don't have an account? <a href="/user/signup" class="signup-link">Sign Up</a></p>
             </div>
         </div>
-    </main>
-    <%- include('partials/footer') %>
+    </div>
+    
 </body>
+<script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
 </html>
