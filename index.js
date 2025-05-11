@@ -43,10 +43,14 @@ app.get('/', (req, res) => {
 
 // default error handler
 app.use((err, req, res, next) => {
-  if (res.headersSent) {
-      return next(err);
-  }
-  res.status(500).json({ error: err });
+  console.error(err.stack);
+  if (res.headersSent) return next(err);
+  // render your friendly error page and pass the true message
+  res.status(err.status || 500).render('errorHandler', {
+    errorCode: err.status || 500,
+    errorMessage: err.message || 'Internal Server Error'
+  });
+  console.log(err);
 });
 
 // start the server
