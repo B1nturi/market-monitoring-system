@@ -45,6 +45,34 @@ router.get('/showblockinfo', authenticateAdmin, async (req, res) => {
     }
 });
 
+router.get('/addcompany', authenticateAdmin, async (req, res) => {
+    try {
+        const toCompanies = await User.aggregate([
+            { $match: { role: 'company' } },
+            {
+                $group: {
+                    _id: "$companyDetails.name",
+                    userId: { $first: "$_id" },
+                    walletaddress: { $first: "$companyDetails.walletaddress" }
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    name: "$_id",
+                    walletaddress: 1,
+                    userId: 1
+                }
+            }
+        ]);
+
+        res.render('addCompany', { toCompanies });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Error fetching company details' });
+    }
+});
+
 // Get all company details (Admin only)
 router.get('/companies', authenticateAdmin, async (req, res) => {
     try {

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+    <style>
+        html, body {
+            height: 100%;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+        main {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+<%- include('partials/header') %>
+
+<div class="container mt-5">
+  <h1 class="mb-4">Add Company</h1>
+  <form action="/admin/addcompany" method="post">
+    <div class="mb-3">
+      <label for="companySelect" class="form-label">Select Company</label>
+      <select id="companySelect" name="companyId" class="form-select" required>
+        <% toCompanies.forEach(c => { %>
+          <option value="<%= c.userId %>" data-wallet="<%= c.walletaddress %>">
+            <%= c.name %>
+          </option>
+        <% }) %>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="walletAddress" class="form-label">Wallet Address</label>
+      <input
+        type="text"
+        id="walletAddress"
+        name="walletaddress"
+        class="form-control"
+        readonly
+      >
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+</div>
+
+<script>
+  const companySelect = document.getElementById('companySelect');
+  const walletInput   = document.getElementById('walletAddress');
+  function updateWallet() {
+    const opt = companySelect.options[companySelect.selectedIndex];
+    walletInput.value = opt.dataset.wallet || '';
+  }
+  companySelect.addEventListener('change', updateWallet);
+  updateWallet();
+</script>
+
+<%- include('partials/footer') %>
