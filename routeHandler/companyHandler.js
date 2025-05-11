@@ -22,8 +22,8 @@ const Block = mongoose.model('Block', block);
 // Helper function to generate product ID
 const generateProductID = (companyID, productName, batchNumber) => {
     const cleanName = productName.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
-
-    return `'${companyID}'-'${batchNumber}'-'${cleanName}'`;
+    
+    return `${companyID}${batchNumber}${cleanName}`;
 };
 
 // Add this route to fetch company details and products
@@ -131,7 +131,27 @@ router.post('/submit-product', authenticateCompany, async (req, res) => {
             companyId: toCompany
         });
         await newProduct.save();
+
+
+        if (product.quantity < quantityBought) {
+            return res.status(400).json({ error: 'Insufficient quantity available' });
+        }
+
+        const updateQuantity = await Product.findOneAndUpdate(
+            { 
+            productID: product.productID
+            },
+            { quantity: product.quantity - quantityBought },
+            { new: true }
+        );
+
+        if (!updateQuantity) {
+            return res.status(404).json({ error: 'Quantity not found or unauthorized' });
+        }
+
+
         const blockchain = req.app.locals.blockchain;
+
 
         await blockchain.addBlock(newProduct);
 
