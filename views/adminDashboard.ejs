@@ -19,7 +19,32 @@
     </style>
 </head>
 <body>
-    <%- include('partials/header') %>
+    <header>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="/">Market Monitoring System</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/addcompany">Add Company</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/revokeCompany">Revoke Company</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
 
     <div class="container mt-5">
         <h1 class="text-center mb-4">Admin Dashboard</h1>
@@ -104,6 +129,7 @@
         <h2 class="mt-5 mb-3">Blockchain Information</h2>
         <a href="/admin/showblockinfo" class="btn btn-primary">View Blockchain Info</a>
         <a href="/admin/addcompany" class="btn btn-primary">Add Company</a>
+        <a href="admin/revokeCompany" class="btn btn-primary">Revoke Company</a>
     <%- include('partials/footer') %>
 </body>
 </html>
