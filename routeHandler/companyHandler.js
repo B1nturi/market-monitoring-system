@@ -72,9 +72,12 @@ router.post('/submit-product', authenticateCompany, async (req, res) => {
         if (req.user.userId.toString() !== companyId.toString()) {
             return res.status(403).json({ error: 'You can only submit data for your own company.' });
         }
+        
+        // Fetch the product details using the productID
+        const product = await Product.find({ productID });
 
         // Generate unique product ID
-        const newProductID = generateProductID(actualCompanyId, productName, batchNumber);
+        const newProductID = generateProductID(toCompany, productName, batchNumber);
         console.log(productID);
 
         const newProductMetrics = new ProductMetrics({
@@ -86,18 +89,18 @@ router.post('/submit-product', authenticateCompany, async (req, res) => {
             quantityBought
         });
 
-        //  const newProduct = new Product({
-        //     productID,
-        //     productName,
-        //     batchNumber,
-        //     manufacturer,
-        //     basePrice,
-        //     quantity,
-        //     companyId: actualCompanyId
-        // });
+         const newProduct = new Product({
+            productID: newProductID,
+            productName: product.productName,
+            batchNumber: product.batchNumber,
+            manufacturer: product.manufacturer,
+            basePrice: product.basePrice,
+            quantity: quantityBought,
+            companyId: toCompany
+        });
 
         await newProductMetrics.save();
-        // await newProduct.save();
+        await newProduct.save();
 
         const blockchain = new Blockchain();
         // Get the last block from the database
