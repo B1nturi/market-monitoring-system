@@ -1,12 +1,33 @@
 <header>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        .navbar {
+            background-color: #ffffff; /* White background */
+            border-bottom: 1px solid #dee2e6; /* Subtle border for separation */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+        }
+        .navbar-brand {
+            font-weight: 700; /* Bold */
+            color: #333333; /* Dark gray for brand text */
+            font-size: 1.5rem; /* Larger font size for brand */
+        }
+        .nav-link {
+            font-weight: 500; /* Medium */
+            font-size: 1rem; /* Standard font size for links */
+            color: #555555; /* Neutral gray for links */
+        }
+        .nav-link:hover {
+            font-weight: 900; /* Green on hover */
+        }
+    </style>
+    <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container">
             <a class="navbar-brand" href="/">Market Monitoring System</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                     <li class="nav-item">
                         <a class="nav-link" href="/dashboard">Dashboard</a>
                     </li>

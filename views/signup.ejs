@@ -1,153 +1,334 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Signup</title>
-    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
-    <style>
-        html, body {
-            height: 100%;
-        }
-        body {
-            display: flex;
-            flex-direction: column;
-        }
-        main {
-            flex: 1;
-        }
-        .toggle-eye {
-            cursor: pointer;
-            background: none;
-            border: none;
-            outline: none;
-        }
-    </style>
-</head>
-<body>
-    <%- include('partials/header') %>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Signup</title>
+        <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Roboto:wght@400;500;700&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            /* Global Reset */
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            html,
+            body {
+                height: 100%;
+                font-family: "Open Sans", sans-serif; /* Use Open Sans for body text */
+            }
+            body {
+                background-color: #f7f7f7; /* Soft light background */
+                color: #333;
+            }
+            main {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 2rem;
+            }
 
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header text-center">
-                        <h2>Signup</h2>
-                    </div>
-                    <div class="card-body">
-                        <form id="signupForm" action="/user/signup" method="POST" class="needs-validation" novalidate>
-                            <div class="mb-3">
-                                <label for="name" class="form-label">Name:</label>
-                                <input type="text" id="name" name="name" class="form-control" required>
-                                <div class="invalid-feedback">Please enter your name.</div>
+            /* Card Styling */
+            .card {
+                width: 100%;
+                max-width: 420px;
+                border-radius: 10px;
+                box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); /* Soft shadow */
+                background-color: white;
+            }
+
+            .card-header {
+                background-color: white;
+                color: #333;
+                padding: 1.5rem;
+                text-align: center;
+                font-size: 2rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                border-top-left-radius: 10px;
+                border-top-right-radius: 10px;
+                font-family: "Roboto", sans-serif; /* Use Roboto for headings */
+            }
+
+            .card-footer {
+                background-color: #f8f9fa;
+                text-align: center;
+                padding: 1rem;
+                border-bottom-left-radius: 10px;
+                border-bottom-right-radius: 10px;
+            }
+
+            /* Form Input Fields */
+            .form-control {
+                border-radius: 8px; /* Rounded corners */
+                border: 1px solid #ccc;
+                padding: 12px;
+                margin-bottom: 15px;
+                font-size: 1rem;
+                font-family: "Open Sans", sans-serif;
+            }
+
+            .form-control:focus {
+                border-color: #007bff;
+                box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+            }
+
+            .form-group {
+                margin-bottom: 1rem;
+            }
+
+            .invalid-feedback {
+                font-size: 0.875em;
+            }
+
+            /* Buttons */
+            .btn-primary {
+                background-color: #007bff; /* Blue buttons */
+                border: none;
+                color: white;
+                font-weight: 600;
+                border-radius: 8px;
+                padding: 12px 15px;
+                width: 100%;
+                font-size: 1rem;
+                transition: all 0.3s ease;
+                font-family: "Roboto", sans-serif;
+            }
+
+            .btn-primary:hover {
+                background-color: #0056b3;
+                transform: translateY(-2px); /* Hover effect */
+            }
+
+            .btn-outline-primary {
+                color: #007bff;
+                border: 2px solid #007bff;
+                font-weight: 600;
+                border-radius: 8px;
+                padding: 12px 15px;
+                width: 100%;
+                font-size: 1rem;
+                transition: all 0.3s ease;
+                font-family: "Roboto", sans-serif;
+            }
+
+            .btn-outline-primary:hover {
+                background-color: #007bff;
+                color: white;
+                transform: translateY(-2px);
+            }
+
+            /* Icons */
+            .toggle-eye {
+                background: none;
+                border: none;
+                outline: none;
+                cursor: pointer;
+                font-size: 1.5rem;
+            }
+
+            .toggle-eye:hover {
+                transform: scale(1.2);
+            }
+
+            /* Mobile Responsiveness */
+            @media (max-width: 768px) {
+                .card {
+                    width: 100%;
+                    padding: 1rem;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <!-- <%- include('partials/header') %> -->
+
+        <main>
+            <div class="card">
+                <div class="card-header">
+                    <h2>Signup</h2>
+                </div>
+                <div class="card-body">
+                    <form
+                        id="signupForm"
+                        action="/user/signup"
+                        method="POST"
+                        class="needs-validation"
+                        novalidate
+                    >
+                        <div class="form-group">
+                            <input
+                                type="text"
+                                id="name"
+                                name="name"
+                                class="form-control"
+                                placeholder="Name"
+                                required
+                            />
+                            <div class="invalid-feedback">Please enter your name.</div>
+                        </div>
+                        <div class="form-group">
+                            <input
+                                type="text"
+                                id="username"
+                                name="username"
+                                class="form-control"
+                                placeholder="Username"
+                                required
+                            />
+                            <div class="invalid-feedback">Please enter a username.</div>
+                        </div>
+                        <div class="form-group">
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                class="form-control"
+                                placeholder="Email"
+                                required
+                            />
+                            <div class="invalid-feedback">
+                                Please enter a valid email address.
                             </div>
-                            <div class="mb-3">
-                                <label for="username" class="form-label">Username:</label>
-                                <input type="text" id="username" name="username" class="form-control" required>
-                                <div class="invalid-feedback">Please enter a username.</div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input
+                                    type="password"
+                                    id="password"
+                                    name="password"
+                                    class="form-control"
+                                    placeholder="Password"
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    class="btn toggle-eye"
+                                    onclick="togglePassword('password', this)"
+                                >
+                                    <img
+                                        src="https://img.icons8.com/?size=100&id=60022&format=png&color=000000"
+                                        alt="eye-icon"
+                                        width="24"
+                                    />
+                                </button>
                             </div>
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email:</label>
-                                <input type="email" id="email" name="email" class="form-control" required>
-                                <div class="invalid-feedback">Please enter a valid email address.</div>
+                            <div class="invalid-feedback">Please enter a password.</div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input
+                                    type="password"
+                                    id="confirmPassword"
+                                    name="confirmPassword"
+                                    class="form-control"
+                                    placeholder="Confirm Password"
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    class="btn toggle-eye"
+                                    onclick="togglePassword('confirmPassword', this)"
+                                >
+                                    <img
+                                        src="https://img.icons8.com/?size=100&id=60022&format=png&color=000000"
+                                        alt="eye-icon"
+                                        width="24"
+                                    />
+                                </button>
                             </div>
-                            <div class="mb-3">
-                                <label for="password" class="form-label">Password:</label>
-                                <div class="input-group">
-                                    <input type="password" id="password" name="password" class="form-control" required>
-                                    <button type="button" class="btn btn-outline-secondary toggle-eye" onclick="togglePassword('password', this)">👁️</button>
-                                </div>
-                                <div class="invalid-feedback">Please enter a password.</div>
+                            <div class="invalid-feedback">Please confirm your password.</div>
+                        </div>
+                        <div class="form-group">
+                            <select id="role" name="role" class="form-control" required>
+                                <option value="" disabled selected>Select Role</option>
+                                <option value="consumer">Consumer</option>
+                                <option value="company">Company</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                            <div class="invalid-feedback">Please select a role.</div>
+                        </div>
+                        <!-- Company Specific Fields -->
+                        <div id="company-fields" style="display: none">
+                            <div class="form-group">
+                                <input
+                                    type="text"
+                                    id="companyName"
+                                    name="companyDetails[name]"
+                                    class="form-control"
+                                    placeholder="Company Name"
+                                />
                             </div>
-                            <div class="mb-3">
-                                <label for="confirmPassword" class="form-label">Confirm Password:</label>
-                                <div class="input-group">
-                                    <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" required>
-                                    <button type="button" class="btn btn-outline-secondary toggle-eye" onclick="togglePassword('confirmPassword', this)">👁️</button>
-                                </div>
-                                <div class="invalid-feedback">Please confirm your password.</div>
+                            <div class="form-group">
+                                <input
+                                    type="text"
+                                    id="registrationNumber"
+                                    name="companyDetails[registrationNumber]"
+                                    class="form-control"
+                                    placeholder="Registration Number"
+                                />
                             </div>
-                            <div class="mb-3">
-                                <label for="role" class="form-label">Role:</label>
-                                <select id="role" name="role" class="form-select" required onchange="toggleCompanyFields()">
-                                    <option value="consumer">Consumer</option>
-                                    <option value="company">Company</option>
-                                    <option value="admin">Admin</option>
-                                </select>
-                                <div class="invalid-feedback">Please select a role.</div>
+                            <div class="form-group">
+                                <input
+                                    type="text"
+                                    id="companyAddress"
+                                    name="companyDetails[address]"
+                                    class="form-control"
+                                    placeholder="Address"
+                                />
                             </div>
-                            <!-- Company Specific Fields -->
-                            <div id="company-fields" style="display: none;">
-                                <div class="mb-3">
-                                    <label for="companyName" class="form-label">Company Name:</label>
-                                    <input type="text" id="companyName" name="companyDetails[name]" class="form-control">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="registrationNumber" class="form-label">Registration Number:</label>
-                                    <input type="text" id="registrationNumber" name="companyDetails[registrationNumber]" class="form-control">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="companyAddress" class="form-label">Address:</label>
-                                    <input type="text" id="companyAddress" name="companyDetails[address]" class="form-control">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="companyWebsite" class="form-label">Website:</label>
-                                    <input type="url" id="companyWebsite" name="companyDetails[website]" class="form-control">
-                                </div>
+                            <div class="form-group">
+                                <input
+                                    type="url"
+                                    id="companyWebsite"
+                                    name="companyDetails[website]"
+                                    class="form-control"
+                                    placeholder="Website"
+                                />
                             </div>
-                            <button type="submit" class="btn btn-primary w-100">Signup</button>
-                        </form>
-                        <% if (typeof error !== 'undefined') { %>
-                            <p class="text-danger text-center mt-3"><%= error %></p>
-                        <% } %>
-                    </div>
-                    <div class="card-footer text-center">
-                        <p>Already have an account?</p>
-                        <a href="/user/login" class="btn btn-secondary w-100">Login</a>
-                    </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Signup</button>
+                    </form>
+                </div>
+                <div class="card-footer flex flex-direction-row justify-content-center">
+                    <p>Already have an account?</p>
+                    <a href="/user/login" class="text-decoration-none">Login</a>
                 </div>
             </div>
-        </div>
-    </div>
+        </main>
 
-    <%- include('partials/footer') %>
-    <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script>
-        function toggleCompanyFields() {
-            const roleSelect = document.getElementById('role');
-            const companyFields = document.getElementById('company-fields');
-            if (roleSelect.value === 'company') {
-                companyFields.style.display = 'block';
-                document.getElementById('companyName').required = true;
-                document.getElementById('registrationNumber').required = true;
-                document.getElementById('companyAddress').required = true;
-            } else {
-                companyFields.style.display = 'none';
-                document.getElementById('companyName').required = false;
-                document.getElementById('registrationNumber').required = false;
-                document.getElementById('companyAddress').required = false;
+        <%- include('partials/footer') %>
+        <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+        <script>
+            function togglePassword(fieldId, btn) {
+                const input = document.getElementById(fieldId);
+                const icon = btn.querySelector("img");
+                if (input.type === "password") {
+                    input.type = "text";
+                    icon.src =
+                        "https://img.icons8.com/?size=100&id=59814&format=png&color=000000"; // Change to closed-eye icon
+                } else {
+                    input.type = "password";
+                    icon.src =
+                        "https://img.icons8.com/?size=100&id=60022&format=png&color=000000"; // Change to open-eye icon
+                }
             }
-        }
 
-        function togglePassword(fieldId, btn) {
-            const input = document.getElementById(fieldId);
-            if (input.type === 'password') {
-                input.type = 'text';
-                btn.textContent = '🙈';
-            } else {
-                input.type = 'password';
-                btn.textContent = '👁️';
-            }
-        }
-
-        document.getElementById('signupForm').addEventListener('submit', function(e) {
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            if (password !== confirmPassword) {
-                e.preventDefault();
-                alert('Passwords do not match!');
-            }
-        });
-    </script>
-</body>
+            // Toggle company fields based on role
+            document.getElementById("role").addEventListener("change", function () {
+                const roleSelect = document.getElementById("role");
+                const companyFields = document.getElementById("company-fields");
+                if (roleSelect.value === "company") {
+                    companyFields.style.display = "block";
+                } else {
+                    companyFields.style.display = "none";
+                }
+            });
+        </script>
+    </body>
 </html>

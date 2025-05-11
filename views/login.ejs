@@ -6,48 +6,101 @@
     <title>Login</title>
     <!-- Use Bootstrap CSS from node_modules -->
     <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
     <style>
-        html, body {
-            height: 100%;
-        }
         body {
-            display: flex;
-            flex-direction: column;
+            font-family: 'Poppins', sans-serif; /* Custom font */
         }
-        main {
-            flex: 1;
+
+        .bg-light-custom {
+            background-color: #f8f9fa; /* Light Grey background */
+        }
+
+        .card-custom {
+            background-color: #ffffff; /* White background for card */
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Light shadow */
+        }
+
+        .card-header-custom {
+            background-color: #ffffff; /* White background for header */
+            border-bottom: 1px solid #ddd; /* Light border for header */
+        }
+
+        .btn-custom {
+            background-color: #28a745; /* Green button color */
+            border-color: #28a745;
+            color: white;
+        }
+
+        .btn-custom:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+        }
+
+        .footer-link {
+            color: #28a745;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+
+        .form-control-custom {
+            border-radius: 4px;
+            box-shadow: none; /* Remove box shadow for inputs */
+            border: 1px solid #ced4da; /* Light border for inputs */
+        }
+
+        .form-label-custom {
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .text-center-custom {
+            text-align: center;
+            color: #495057;
+        }
+
+        .signup-link {
+            color: #28a745;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .signup-link:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
-<body>
-    <%- include('partials/header') %>
-    <main>
-        <div class="container mt-5">
-            <div class="row justify-content-center">
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-header text-center">
-                            <h2>Login</h2>
+<body class="bg-light-custom d-flex flex-column min-vh-100">
+    <main class="flex-grow-1 d-flex justify-content-center align-items-center">
+        <div class="container">
+            <div class="row">
+                <div class="col-9 col-lg-4 mx-auto">
+                    <div class="card card-custom">
+                        <div class="card-header card-header-custom text-center my-3 border-none">
+                            <h1 class="fs-3">Market Monitoring System</h1>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body col-10 col-lg-9 mx-auto">
                             <form action="./login" method="POST">
                                 <div class="mb-3">
-                                    <label for="username" class="form-label">Username:</label>
-                                    <input type="text" id="username" name="username" class="form-control" required>
+                                    <input type="text" id="username" name="username" class="form-control form-control-custom" placeholder="Username" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="password" class="form-label">Password:</label>
-                                    <input type="password" id="password" name="password" class="form-control" required>
+                                    <input type="password" id="password" name="password" class="form-control form-control-custom" placeholder="Password" required>
                                 </div>
-                                <button type="submit" class="btn btn-primary w-100">Login</button>
+                                <button type="submit" class="btn btn-custom w-100">Login</button>
                             </form>
                             <% if (typeof error !== 'undefined') { %>
                                 <p class="text-danger text-center mt-3"><%= error %></p>
                             <% } %>
                         </div>
-                        <div class="card-footer text-center">
-                            <p>Don't have an account?</p>
-                            <a href="/user/signup" class="btn btn-secondary w-100">Sign Up</a>
+                        <div class="text-center bg-light my-4">
+                            <p class="mb-2">Don't have an account? <a href="/user/signup" class="signup-link">Sign Up</a></p>
                         </div>
                     </div>
                 </div>
