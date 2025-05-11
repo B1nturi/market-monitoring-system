@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/ethers/dist/ethers.umd.min.js"></script>
+    <style>
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        display: flex;
+        flex-direction: column;
+      }
+      main {
+        flex: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <%- include('partials/header') %>
+
+    <div class="container mt-5">
+      <button id="connectBtn" class="btn btn-success">🔌 Connect Wallet</button>
+      <button id="disconnectBtn" class="btn btn-danger" disabled>
+        ❌ Disconnect
+      </button>
+      <p class="mt-2">
+        Connected Address: <span id="wallet-address">Not connected</span>
+      </p>
+      <h1 class="mb-4">Add Company</h1>
+      <form>
+        <div class="mb-3">
+          <label for="companySelect" class="form-label">Select Company</label>
+          <select
+            id="companySelect"
+            name="companyId"
+            class="form-select"
+            required
+          >
+            <% toCompanies.forEach(c => { %>
+            <option
+              value="<%= c.userId %>"
+              data-wallet="<%= c.walletaddress %>"
+            >
+              <%= c.name %>
+            </option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="walletAddress" class="form-label">Wallet Address</label>
+          <input
+            type="text"
+            id="walletAddress"
+            name="walletaddress"
+            class="form-control"
+            readonly
+          />
+        </div>
+        <button id="registerCompanyBtn" type="button" class="btn btn-primary">
+          Submit
+        </button>
+      </form>
+    </div>
+
+    <script>
+      const companySelect = document.getElementById("companySelect");
+      const walletInput = document.getElementById("walletAddress");
+      function updateWallet() {
+        const opt = companySelect.options[companySelect.selectedIndex];
+        walletInput.value = opt.dataset.wallet || "";
+      }
+      companySelect.addEventListener("change", updateWallet);
+      updateWallet();
+
+      const connectBtn = document.getElementById("connectBtn");
+      const disconnectBtn = document.getElementById("disconnectBtn");
+      const walletDisplay = document.getElementById("wallet-address");
+      const registerBtn = document.getElementById("registerCompanyBtn");
+      const companyWalletInput = document.getElementById("walletAddress");
+      const nameInput = document.getElementById("name");
+      let currentAccount = null;
+
+      async function connectWallet() {
+        if (!window.ethereum) {
+          alert("MetaMask not found. Please install it.");
+          return;
+        }
+
+        try {
+          console.log("Requesting account...");
+          const accounts = await window.ethereum.request({
+            method: "eth_requestAccounts",
+          });
+          currentAccount = accounts[0];
+          walletDisplay.textContent = currentAccount;
+          connectBtn.disabled = true;
+          disconnectBtn.disabled = false;
+        } catch (err) {
+          console.error("Wallet connection failed:", err);
+        }
+      }
+      function disconnectWallet() {
+        currentAccount = null;
+        walletDisplay.textContent = "Not connected";
+        connectBtn.disabled = false;
+        disconnectBtn.disabled = true;
+      }
+      connectBtn.addEventListener("click", connectWallet);
+      disconnectBtn.addEventListener("click", disconnectWallet);
+
+      // Register company on the blockchain
+      // const dotenv = require("dotenv");
+      // dotenv.config();
+
+      const contractAddress = "0xCb6DEFdBD93a6ae3149c1149029BB26981919e06"; // <<<--- Replace with your contract address
+
+      const contractABI = [
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "company",
+              type: "address",
+            },
+          ],
+          name: "CompanyRegistered",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "company",
+              type: "address",
+            },
+          ],
+          name: "CompanyRevoked",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "uint256",
+              name: "entryId",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "string",
+              name: "companyId",
+              type: "string",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "fromAddress",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "string",
+              name: "productID",
+              type: "string",
+            },
+            {
+              indexed: false,
+              internalType: "string",
+              name: "productOrigin",
+              type: "string",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "toCompanyAddress",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "string",
+              name: "toCompanyId",
+              type: "string",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "sellingPrice",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "quantityBought",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "timestamp",
+              type: "uint256",
+            },
+          ],
+          name: "ProductMetricRecorded",
+          type: "event",
+        },
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "companyId",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "productID",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "productOrigin",
+              type: "string",
+            },
+            {
+              internalType: "address",
+              name: "toCompanyAddress",
+              type: "address",
+            },
+            {
+              internalType: "string",
+              name: "toCompanyId",
+              type: "string",
+            },
+            {
+              internalType: "uint256",
+              name: "sellingPrice",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "quantityBought",
+              type: "uint256",
+            },
+          ],
+          name: "recordProductMetric",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "company",
+              type: "address",
+            },
+          ],
+          name: "registerCompany",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "company",
+              type: "address",
+            },
+          ],
+          name: "revokeCompany",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [],
+          stateMutability: "nonpayable",
+          type: "constructor",
+        },
+        {
+          inputs: [],
+          name: "admin",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getAllMetrics",
+          outputs: [
+            {
+              components: [
+                {
+                  internalType: "uint256",
+                  name: "entryId",
+                  type: "uint256",
+                },
+                {
+                  internalType: "string",
+                  name: "companyId",
+                  type: "string",
+                },
+                {
+                  internalType: "address",
+                  name: "fromAddress",
+                  type: "address",
+                },
+                {
+                  internalType: "string",
+                  name: "productID",
+                  type: "string",
+                },
+                {
+                  internalType: "string",
+                  name: "productOrigin",
+                  type: "string",
+                },
+                {
+                  internalType: "address",
+                  name: "toCompanyAddress",
+                  type: "address",
+                },
+                {
+                  internalType: "string",
+                  name: "toCompanyId",
+                  type: "string",
+                },
+                {
+                  internalType: "uint256",
+                  name: "sellingPrice",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint256",
+                  name: "quantityBought",
+                  type: "uint256",
+                },
+                {
+                  internalType: "uint256",
+                  name: "timestamp",
+                  type: "uint256",
+                },
+              ],
+              internalType: "struct ProductMetricsRegistry.ProductMetrics[]",
+              name: "",
+              type: "tuple[]",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          name: "isCompany",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          name: "metricIds",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          name: "metrics",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "entryId",
+              type: "uint256",
+            },
+            {
+              internalType: "string",
+              name: "companyId",
+              type: "string",
+            },
+            {
+              internalType: "address",
+              name: "fromAddress",
+              type: "address",
+            },
+            {
+              internalType: "string",
+              name: "productID",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "productOrigin",
+              type: "string",
+            },
+            {
+              internalType: "address",
+              name: "toCompanyAddress",
+              type: "address",
+            },
+            {
+              internalType: "string",
+              name: "toCompanyId",
+              type: "string",
+            },
+            {
+              internalType: "uint256",
+              name: "sellingPrice",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "quantityBought",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "timestamp",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "totalEntries",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+      ];
+
+      async function registerCompanyOnChain() {
+        const companyAddress = companyWalletInput.value.trim();
+
+        if (!companyAddress || !ethers.isAddress(companyAddress)) {
+          alert("⚠️ Please enter a valid Ethereum address.");
+          return;
+        }
+
+        try {
+          const provider = new ethers.BrowserProvider(window.ethereum);
+          const signer = await provider.getSigner();
+          const contract = new ethers.Contract(
+            contractAddress,
+            contractABI,
+            signer
+          );
+
+          const tx = await contract.registerCompany(companyAddress);
+          await tx.wait();
+
+          alert(`✅ Company ${companyAddress} registered on blockchain.`);
+        } catch (error) {
+          console.error("Registration failed:", error);
+          alert("❌ Registration failed. Check the console for details.");
+        }
+      }
+
+      registerBtn.addEventListener("click", async (e) => {
+        e.preventDefault(); // ← stop the form submit
+        if (!currentAccount) {
+          alert("Please connect your wallet first.");
+          return;
+        }
+        await registerCompanyOnChain();
+      });
+    </script>
+
+    <%- include('partials/footer') %>
+  </body>
+</html>
