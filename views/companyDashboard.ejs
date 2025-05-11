@@ -42,14 +42,16 @@
                 <h2>Products</h2>
             </div>
             <div class="card-body">
-                <% if (products.length > 0) { %>
+                <% if (products && products.length > 0) { %>
                     <div class="table-responsive">
                         <table class="table table-bordered table-striped">
                             <thead class="table-dark">
                                 <tr>
                                     <th>Product Name</th>
-                                    <th>Origin</th>
+                                    <th>Manufacturer</th>
                                     <th>Base Price</th>
+                                    <th>Product ID</th>
+                                    <th>Creation Date</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -58,6 +60,8 @@
                                         <td><%= product.productName %></td>
                                         <td><%= product.manufacturer %></td>
                                         <td><%= product.basePrice %></td>
+                                        <td><%= product.productID %></td>
+                                        <td><%= new Date(product.createdAt * 1000).toLocaleString() %></td> <!-- Convert timestamp to readable format -->
                                     </tr>
                                 <% }) %>
                             </tbody>

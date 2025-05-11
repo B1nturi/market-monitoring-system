@@ -1,211 +1,160 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
-const productSchema = require('../schemas/productSchema');
 const jwt = require('jsonwebtoken');
+const productSchema = require('../schemas/productSchema');
 const { authenticateCompany, authenticateAdmin } = require('../middlewares/authMiddleware');
-
-// mongoose model
+const { ethers } = require('ethers');
+const contractABI = require('../smartContract/product_eth_abi.json');
+const dotenv = require('dotenv');
+dotenv.config();
+// Setup Mongoose model
 const Product = mongoose.model('Product', productSchema);
 
-// Helper function to generate product ID
+// Setup ethers
+
+const provider = new ethers.JsonRpcProvider(process.env.INFURA_API_URL);
+const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+const contract = new ethers.Contract(process.env.CONTRACT_ADDRESS, contractABI, wallet);
+
+// Helper: Generate unique product ID
 const generateProductID = (companyID, productName) => {
-    const cleanName = productName.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
-    
-    return `'${companyID}'|'${cleanName}'`;
+  const cleanName = productName.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+  return `${companyID}|${cleanName}`;
 };
 
-// Add this route to render the add product form
+// Route: Show add product form
 router.get('/add', authenticateCompany, (req, res) => {
-    res.render('addProduct');
+  res.render('addProduct');
 });
 
-// Create a new product
+// Route: Create new product (DB + Blockchain)
+// Route: Create new product (DB + Blockchain)
 router.post('/create', authenticateCompany, async (req, res) => {
+  try {
+    const { productName, manufacturer, basePrice } = req.body;
+    const token = req.cookies.token;
+
+    let decoded;
     try {
-        const { productName, manufacturer, basePrice } = req.body;
-        
-        const companyId = req.cookies.token;
-
-        if (!companyId) {
-            return res.status(401).json({ error: 'Please login to continue' });
-        }
-
-        const decoded = jwt.verify(companyId, process.env.JWT_SECRET);
-        const actualCompanyId = decoded.userId;
-
-        if (!productName || !manufacturer || !basePrice) {
-            return res.status(400).json({ error: 'Missing required fields' });
-        }
-
-        // Generate unique product ID
-        const productID = generateProductID(actualCompanyId, productName);
-        console.log(productID);
-
-        // Check if product ID already exists
-        const existingProduct = await Product.findOne({ productID });
-        console.log(existingProduct);
-        if (existingProduct) {
-            return res.status(400).json({ error: 'Product ID already exists. Please try again.' });
-        }
-
-        const newProduct = new Product({
-            productID,
-            productName,
-            manufacturer,
-            basePrice,
-            companyId: actualCompanyId
-        });
-
-        await newProduct.save();
-        res.status(201).json({ 
-            message: 'Product created successfully',
-            product: newProduct 
-        });
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Error creating product' });
+      return res.status(401).json({ error: 'Invalid or expired token' });
     }
+
+    const companyId = decoded.userId;
+    const productID = generateProductID(manufacturer, productName);
+
+    const existingProduct = await Product.findOne({ productID });
+    if (existingProduct) {
+      return res.status(400).json({ error: 'Product already exists' });
+    }
+
+    
+
+    // Save to MongoDB
+    const newProduct = new Product({
+      productID,
+      productName,
+      manufacturer,
+      basePrice,
+      companyId
+    });
+
+    await newProduct.save();
+    res.status(201).json({ message: 'Product created', product: newProduct });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error creating product' });
+  }
 });
 
-// Get all products for the authenticated company
+
+// Route: Get products for current company
 router.get('/myproducts', authenticateCompany, async (req, res) => {
-    console.log('Inside myproducts');
-    try {
-        const token = req.cookies.token;
-        if (!token) {
-            return res.status(401).json({ error: 'Please login to continue' });
-        }
+  try {
+    const token = req.cookies.token;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const companyId = decoded.userId;
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const companyId = decoded.userId;
-        
-        const products = await Product.find({ companyId });
-        
-        res.status(200).json({ 
-            message: 'Products fetched successfully',
-            data: products 
-        });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Error fetching products' }); // Changed from 1000 to 500
-    }
+    const products = await Product.find({ companyId });
+    res.status(200).json({ data: products });
+  } catch (err) {
+    res.status(500).json({ error: 'Error fetching products' });
+  }
 });
 
-// Get all products (accessible to all)
+// Route: Get all products
 router.get('/all/:companyId?', authenticateAdmin, async (req, res) => {
-    try {
-        let query = {};
-        if (req.params.companyId) {
-            query.companyId = req.params.companyId;
-        }
-
-        const products = await Product.find(query)
-            .populate('companyId', 'companyName')
-            .sort({ createdAt: -1 });
-
-        res.status(200).json({ 
-            message: 'Products fetched successfully',
-            count: products.length,
-            data: products 
-        });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Error fetching products' });
-    }
+  try {
+    const query = req.params.companyId ? { companyId: req.params.companyId } : {};
+    const products = await Product.find(query).populate('companyId', 'companyName').sort({ createdAt: -1 });
+    res.status(200).json({ data: products });
+  } catch (err) {
+    res.status(500).json({ error: 'Error fetching all products' });
+  }
 });
 
-// Add this route after your existing routes
+// Route: Get product by ID
 router.get('/id/:productID', async (req, res) => {
-    try {
-        const product = await Product.findOne({ 
-            productID: req.params.productID 
-        }).populate('companyId', 'companyName');
-
-        if (!product) {
-            return res.status(404).json({ error: 'Product not found' });
-        }
-
-        res.status(200).json({
-            message: 'Product fetched successfully',
-            data: product
-        });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Error fetching product' });
-    }
+  try {
+    const product = await Product.findOne({ productID: req.params.productID }).populate('companyId', 'companyName');
+    if (!product) return res.status(404).json({ error: 'Not found' });
+    res.status(200).json({ data: product });
+  } catch (err) {
+    res.status(500).json({ error: 'Error fetching product' });
+  }
 });
 
-// put product by ID
+// Route: Update product (DB + Blockchain)
 router.put('/:productID', authenticateCompany, async (req, res) => {
-    try {
-        const token = req.cookies.token;
-        if (!token) {
-            return res.status(401).json({ error: 'Please login to continue' });
-        }
+  try {
+    const token = req.cookies.token;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const companyId = decoded.userId;
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const companyId = decoded.userId;
-        
-        companyID = await Product.find({ companyId });
+    const updates = { ...req.body, updatedAt: Date.now() };
+    const product = await Product.findOneAndUpdate(
+      { productID: req.params.productID, companyId },
+      updates,
+      { new: true }
+    );
 
-        const updates = {
-            ...req.body,
-            updatedAt: Date.now()
-        };
+    if (!product) return res.status(404).json({ error: 'Not found or unauthorized' });
 
-        const product = await Product.findOneAndUpdate(
-            { 
-                productID: req.params.productID,
-                companyId
-            },
-            updates,
-            { new: true }
-        );
+    const tx = await contract.updateProduct(
+      req.params.productID,
+      product.productName,
+      product.manufacturer,
+      product.basePrice
+    );
+    await tx.wait();
 
-        if (!product) {
-            return res.status(404).json({ error: 'Product not found or unauthorized' });
-        }
-
-        res.status(200).json({ 
-            message: 'Product updated successfully',
-            data: product 
-        });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Error updating product' });
-    }
+    res.status(200).json({ message: 'Product updated', data: product });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error updating product' });
+  }
 });
 
-
-// Delete product (only by owning company)
+// Route: Delete product (DB + Blockchain)
 router.delete('/:productID', authenticateCompany, async (req, res) => {
-    try {
-        const token = req.cookies.token;
-        if (!token) {
-            return res.status(401).json({ error: 'Please login to continue' });
-        }
+  try {
+    const token = req.cookies.token;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const companyId = decoded.userId;
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const companyId = decoded.userId;
+    const product = await Product.findOneAndDelete({ productID: req.params.productID, companyId });
+    if (!product) return res.status(404).json({ error: 'Not found or unauthorized' });
 
-        const product = await Product.findOneAndDelete({ 
-            productID: req.params.productID,
-            companyId
-        });
-        
-        if (!product) {
-            return res.status(404).json({ error: 'Product not found or unauthorized' });
-        }
+    const tx = await contract.deleteProduct(req.params.productID);
+    await tx.wait();
 
-        res.status(200).json({ 
-            message: 'Product deleted successfully',
-            data: product 
-        });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Error deleting product' });
-    }
+    res.status(200).json({ message: 'Product deleted', data: product });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error deleting product' });
+  }
 });
 
 module.exports = router;

@@ -8,6 +8,9 @@ const product = require('../schemas/productSchema');
 const Blockchain = require('../blockchain');
 const { authenticateCompany } = require('../middlewares/authMiddleware');
 const block = require('../schemas/block');
+const { ethers } = require("ethers");  // Importing ethers.js
+const dotenv = require('dotenv');
+dotenv.config();
 
 // Assuming you've already created a model for company data.
 const ProductMetrics = mongoose.model('ProductMetric', productMetricsSchema);
@@ -15,7 +18,24 @@ const User = mongoose.model('User', userSchema);
 const Product = mongoose.model('Product', product);
 const Block = mongoose.model('Block', block);
 
-// Add this route to fetch company details and products
+// Ethereum contract details
+const contractAddress = process.env.CONTRACT_ADDRESS;
+const abi = require('../smartContract/product_eth_abi.json');
+const provider = new ethers.JsonRpcProvider(process.env.INFURA_API_URL);
+const contract = new ethers.Contract(contractAddress, abi, provider);
+
+// Fetch the products by company address from the blockchain
+async function getProductsByCompany(companyAddress) {
+    const products = await contract.getProductsByCompany(companyAddress);
+    return products.map(product => ({
+        productID: product.productID,
+        productName: product.productName,
+        manufacturer: product.manufacturer,
+        basePrice: product.basePrice, // Format base price if it's in wei
+        createdAt: product.createdAt.toString(),
+    }));
+}
+
 router.get('/dashboard', authenticateCompany, async (req, res) => {
     try {
         const decoded = jwt.verify(req.cookies.token, process.env.JWT_SECRET);
@@ -23,11 +43,24 @@ router.get('/dashboard', authenticateCompany, async (req, res) => {
 
         // Fetch company details
         const company = await User.findById(companyId);
+        if (!company) {
+            return res.status(404).json({ error: 'Company not found' });
+        }
 
-        // Fetch products of the company
+        // ✅ Get Ethereum address from cookie OR from company record
+        const companyAddress = req.cookies.ethAddress || company.companyDetails?.address;
+
+        if (!companyAddress) {
+            return res.status(400).json({ error: 'Company Ethereum address not found.' });
+        }
+
+        // Fetch products from the blockchain
+        const blockchainProducts = await getProductsByCompany(companyAddress);
+
+        // Fetch products from database
         const products = await Product.find({ companyId });
 
-        res.render('companyDashboard', { company, products });
+        res.render('companyDashboard', { company, products: blockchainProducts });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Error while fetching dashboard data' });
@@ -36,20 +69,25 @@ router.get('/dashboard', authenticateCompany, async (req, res) => {
 
 // Example Express route
 router.get('/submit-product', async (req, res) => {
-    // Fetch data here from your respective DB model collections
-
     const decoded = jwt.verify(req.cookies.token, process.env.JWT_SECRET);
     const companyId = decoded.userId;
-    const products = await Product.find({ companyId });
-    // console.log(products);
 
-    // Fetch unique company names along with their user IDs
+    // Fetch products for the company from the blockchain
+    const company = await User.findById(companyId);
+    const companyAddress = req.cookies.ethAddress || company.companyDetails?.address;
+
+    if (!companyAddress) {
+        return res.status(400).json({ error: 'Company Ethereum address not found.' });
+    }
+    const blockchainProducts = await getProductsByCompany(companyAddress);
+
+    // Fetch unique company names along with their user IDs for submission purposes
     const toCompanies = await User.aggregate([
         { $match: { role: 'company' } },
         { $group: { _id: "$companyDetails.name", userId: { $first: "$_id" } } }
     ]);
 
-    res.render('productMetricsForm', { companyId, products, toCompanies });
+    res.render('productMetricsForm', { companyId, products: blockchainProducts, toCompanies });
 });
 
 // Create a new product submission (Company only)
@@ -61,7 +99,6 @@ router.post('/submit-product', authenticateCompany, async (req, res) => {
             return res.status(400).json({ error: 'Missing required fields' });
         }
 
-        // Ensure that the company is submitting data for their own company
         if (req.user.userId.toString() !== companyId.toString()) {
             return res.status(403).json({ error: 'You can only submit data for your own company.' });
         }
@@ -78,16 +115,10 @@ router.post('/submit-product', authenticateCompany, async (req, res) => {
         await newProduct.save();
 
         const blockchain = new Blockchain();
-        // Get the last block from the database
-        const lastBlock = await Block.findOne().sort({ index: -1 }); // Get the block with the highest index
-
-        // If no blocks exist (in case of a fresh start), set the index to 0
+        const lastBlock = await Block.findOne().sort({ index: -1 });
         const newIndex = lastBlock ? lastBlock.index + 1 : 0;
 
-        // Create a new block with the necessary fields
-        
-        // Add the new product data to the blockchain
-        await blockchain.addBlock(newProduct);
+        await blockchain.addBlock(newProduct); // Add to blockchain
 
         res.status(201).json({ message: 'Product submitted successfully' });
     } catch (err) {
@@ -96,6 +127,7 @@ router.post('/submit-product', authenticateCompany, async (req, res) => {
     }
 });
 
+// Fetch all product metrics submissions
 router.get('/view-submissions', authenticateCompany, async (req, res) => {
     try {
         const submissions = await ProductMetrics.find();
@@ -105,5 +137,5 @@ router.get('/view-submissions', authenticateCompany, async (req, res) => {
     }
 });
 
-// export the router
+// Export the router
 module.exports = router;

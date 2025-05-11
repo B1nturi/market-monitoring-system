@@ -1,91 +1,622 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
-    <style>
-        html, body {
-            height: 100%;
-        }
-        body {
-            display: flex;
-            flex-direction: column;
-        }
-        main {
-            flex: 1;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.6.2/dist/ethers.umd.min.js"></script>
+  <style>
+    html, body {
+      height: 100%;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+    main {
+      flex: 1;
+    }
+  </style>
 </head>
 <body>
-    <%- include('partials/header') %>
+  <%- include('partials/header') %>
 
-    <div class="container mt-5">
-        <h1 class="text-center mb-4">Admin Dashboard</h1>
+  <div class="container mt-5">
+    <h1 class="text-center mb-4">Admin Dashboard</h1>
 
-        <!-- Company Details Section -->
-        <h2 class="mb-3">Company Details</h2>
-        <% if (companies.length > 0) { %>
-            <div class="table-responsive">
-                <table class="table table-bordered table-striped">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Company Name</th>
-                            <th>Email</th>
-                            <th>Address</th>
-                            <th>Website</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% companies.forEach(company => { %>
-                            <tr>
-                                <td><%= company.companyDetails.name %></td>
-                                <td><%= company.email %></td>
-                                <td><%= company.companyDetails.address %></td>
-                                <td><%= company.companyDetails.website %></td>
-                            </tr>
-                        <% }) %>
-                    </tbody>
-                </table>
-            </div>
-        <% } else { %>
-            <p class="text-muted">No companies available.</p>
-        <% } %>
+    <!-- Company Details Section -->
+    <h2 class="mb-3">Company Details</h2>
+    <% if (companies.length > 0) { %>
+      <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+          <thead class="table-dark">
+            <tr>
+              <th>Company Name</th>
+              <th>Email</th>
+              <th>Address</th>
+              <th>Website</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% companies.forEach(company => { %>
+              <tr>
+                <td><%= company.companyDetails.name %></td>
+                <td><%= company.email %></td>
+                <td><%= company.companyDetails.address %></td>
+                <td><%= company.companyDetails.website %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } else { %>
+      <p class="text-muted">No companies available.</p>
+    <% } %>
 
-        <!-- Consumer Complaints Section -->
-        <h2 class="mt-5 mb-3">Consumer Complaints</h2>
-        <% if (complaints.length > 0) { %>
-            <div class="table-responsive">
-                <table class="table table-bordered table-striped">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Consumer Name</th>
-                            <th>Consumer Email</th>
-                            <th>Company Name</th>
-                            <th>Complaint</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% complaints.forEach(complaint => { %>
-                            <tr>
-                                <td><%= complaint.consumerId.name %></td>
-                                <td><%= complaint.consumerId.email %></td>
-                                <td><%= complaint.companyId.companyDetails.name %></td>
-                                <td><%= complaint.description %></td>
-                            </tr>
-                        <% }) %>
-                    </tbody>
-                </table>
-            </div>
-        <% } else { %>
-            <p class="text-muted">No complaints available.</p>
-        <% } %>
+    <!-- Consumer Complaints Section -->
+    <h2 class="mt-5 mb-3">Consumer Complaints</h2>
+    <% if (complaints.length > 0) { %>
+      <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+          <thead class="table-dark">
+            <tr>
+              <th>Consumer Name</th>
+              <th>Consumer Email</th>
+              <th>Company Name</th>
+              <th>Complaint</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% complaints.forEach(complaint => { %>
+              <tr>
+                <td><%= complaint.consumerId.name %></td>
+                <td><%= complaint.consumerId.email %></td>
+                <td><%= complaint.companyId.companyDetails.name %></td>
+                <td><%= complaint.description %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } else { %>
+      <p class="text-muted">No complaints available.</p>
+    <% } %>
 
-        <!-- Blockchain Information Section -->
-        <h2 class="mt-5 mb-3">Blockchain Information</h2>
-        <a href="/admin/showblockinfo" class="btn btn-primary">View Blockchain Info</a>
+    <!-- Blockchain Information Section -->
+    <h2 class="mt-5 mb-3">Blockchain Information</h2>
+    <a href="/admin/showblockinfo" class="btn btn-primary">View Blockchain Info</a><br><br>
 
-    <%- include('partials/footer') %>
+    <!-- Wallet Connect UI -->
+    <button id="connectBtn" class="btn btn-success">🔌 Connect Wallet</button>
+    <button id="disconnectBtn" class="btn btn-danger" disabled>❌ Disconnect</button>
+    <p class="mt-2">Connected Address: <span id="wallet-address">Not connected</span></p>
+
+    <!-- Register Company UI -->
+    <div class="mt-4">
+      <h4>Register a Company on Blockchain</h4>
+      <div class="mb-3">
+        <label for="companyWallet" class="form-label">Company Wallet Address</label>
+        <input type="text" id="companyWallet" class="form-control" placeholder="0x..." />
+      </div>
+      <button id="registerCompanyBtn" class="btn btn-primary">🏢 Register Company</button>
+    </div>
+  </div>
+
+  <%- include('partials/footer') %>
+
+  <!-- Ethers.js CDN -->
+  
+
+
+  <script>
+    const connectBtn = document.getElementById('connectBtn');
+    const disconnectBtn = document.getElementById('disconnectBtn');
+    const walletDisplay = document.getElementById('wallet-address');
+    const registerBtn = document.getElementById('registerCompanyBtn');
+    const companyWalletInput = document.getElementById('companyWallet');
+
+    let currentAccount = null;
+
+    async function connectWallet() {
+      if (!window.ethereum) {
+        alert('MetaMask not found. Please install it.');
+        return;
+      }
+
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        currentAccount = accounts[0];
+        walletDisplay.textContent = currentAccount;
+        connectBtn.disabled = true;
+        disconnectBtn.disabled = false;
+      } catch (err) {
+        console.error('Wallet connection failed:', err);
+      }
+    }
+
+    function disconnectWallet() {
+      currentAccount = null;
+      walletDisplay.textContent = 'Not connected';
+      connectBtn.disabled = false;
+      disconnectBtn.disabled = true;
+    }
+
+    connectBtn.addEventListener('click', connectWallet);
+    disconnectBtn.addEventListener('click', disconnectWallet);
+
+    // Paste your contract ABI here
+    
+    const contractAddress = "0xE25E44DDe1282Ca97c9b269001586932323Da1A4"; // <<<--- Replace with your contract address
+
+    const contractABI = [
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "company",
+				"type": "address"
+			}
+		],
+		"name": "CompanyRegistered",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "company",
+				"type": "address"
+			}
+		],
+		"name": "CompanyRevoked",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "string",
+				"name": "productID",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "productName",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "manufacturer",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "basePrice",
+				"type": "uint256"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "company",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "timestamp",
+				"type": "uint256"
+			}
+		],
+		"name": "ProductCreated",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "string",
+				"name": "productID",
+				"type": "string"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "company",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "timestamp",
+				"type": "uint256"
+			}
+		],
+		"name": "ProductDeleted",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "string",
+				"name": "productID",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "productName",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "manufacturer",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "basePrice",
+				"type": "uint256"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "company",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "timestamp",
+				"type": "uint256"
+			}
+		],
+		"name": "ProductUpdated",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "productID",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "productName",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "manufacturer",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "basePrice",
+				"type": "uint256"
+			}
+		],
+		"name": "createProduct",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "productID",
+				"type": "string"
+			}
+		],
+		"name": "deleteProduct",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "company",
+				"type": "address"
+			}
+		],
+		"name": "registerCompany",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "company",
+				"type": "address"
+			}
+		],
+		"name": "revokeCompany",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "productID",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "productName",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "manufacturer",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "basePrice",
+				"type": "uint256"
+			}
+		],
+		"name": "updateProduct",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "admin",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getAllProducts",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "string",
+						"name": "productID",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "productName",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "manufacturer",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "basePrice",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "company",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "createdAt",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "updatedAt",
+						"type": "uint256"
+					},
+					{
+						"internalType": "bool",
+						"name": "exists",
+						"type": "bool"
+					}
+				],
+				"internalType": "struct ProductRegistry.Product[]",
+				"name": "",
+				"type": "tuple[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "productID",
+				"type": "string"
+			}
+		],
+		"name": "getProduct",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "company",
+				"type": "address"
+			}
+		],
+		"name": "getProductsByCompany",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "string",
+						"name": "productID",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "productName",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "manufacturer",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "basePrice",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "company",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "createdAt",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "updatedAt",
+						"type": "uint256"
+					},
+					{
+						"internalType": "bool",
+						"name": "exists",
+						"type": "bool"
+					}
+				],
+				"internalType": "struct ProductRegistry.Product[]",
+				"name": "",
+				"type": "tuple[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "isCompany",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+];
+    
+
+    async function registerCompanyOnChain() {
+      const companyAddress = companyWalletInput.value.trim();
+
+      if (!companyAddress || !ethers.isAddress(companyAddress)) {
+        alert("⚠️ Please enter a valid Ethereum address.");
+        return;
+      }
+
+      try {
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
+        const contract = new ethers.Contract(contractAddress, contractABI, signer);
+
+        const tx = await contract.registerCompany(companyAddress);
+        await tx.wait();
+
+        alert(`✅ Company ${companyAddress} registered on blockchain.`);
+      } catch (error) {
+        console.error('Registration failed:', error);
+        alert("❌ Registration failed. Check the console for details.");
+      }
+    }
+
+    registerBtn.addEventListener('click', async () => {
+      if (!currentAccount) {
+        alert("Please connect your wallet first.");
+        return;
+      }
+      await registerCompanyOnChain();
+    });
+  </script>
 </body>
 </html>

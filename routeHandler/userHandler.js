@@ -43,16 +43,36 @@ router.get('/login', (req, res) => {
 // Login
 router.post('/login', async (req, res) => {
     try {
-        const user = await User.findOne({ username: req.body.username });
-        //console.log(user);
+        const { username, password, ethAddress } = req.body;
+        const user = await User.findOne({ username });
+
         if (!user) {
             return res.status(404).render('login', { error: "Authorization failed" });
         }
-        if (await bcrypt.compare(req.body.password, user.password)) {
-            const token = jwt.sign({ username: user.username, userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-            res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'strict', maxAge: 3600000 }); // 1 hour
-            
-            // Redirect based on user role
+
+        if (await bcrypt.compare(password, user.password)) {
+            const token = jwt.sign(
+                { username: user.username, userId: user._id, role: user.role },
+                process.env.JWT_SECRET,
+                { expiresIn: '1h' }
+            );
+
+            // Set the JWT and Ethereum address in cookies
+            res.cookie('token', token, {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'strict',
+                maxAge: 3600000 // 1 hour
+            });
+
+            res.cookie('ethAddress', ethAddress, {
+                httpOnly: false, // Allow access from client-side JS if needed
+                secure: true,
+                sameSite: 'strict',
+                maxAge: 3600000
+            });
+
+            // Redirect based on role
             if (user.role === 'admin') {
                 res.redirect('/admin/dashboard');
             } else if (user.role === 'company') {
@@ -66,9 +86,11 @@ router.post('/login', async (req, res) => {
             res.status(401).render('login', { error: "Invalid credentials" });
         }
     } catch (err) {
+        console.error(err);
         res.status(500).render('login', { error: "There was an error while logging in" });
     }
 });
+
 
 // Logout
 router.get('/logout', (req, res) => {

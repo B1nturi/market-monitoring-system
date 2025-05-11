@@ -39,6 +39,12 @@
                                     <label for="password" class="form-label">Password:</label>
                                     <input type="password" id="password" name="password" class="form-control" required>
                                 </div>
+                                <div class="mb-3"></div>
+                                    <select id="ethAddressSelect" name="ethAddress" required>
+                                    <option value="">Select Wallet Address</option>
+                                    </select>
+                                    <button type="button" id="connectWallet">Connect Wallet</button>
+                                </div>
                                 <button type="submit" class="btn btn-primary w-100">Login</button>
                             </form>
                             <% if (typeof error !== 'undefined') { %>
@@ -55,5 +61,34 @@
         </div>
     </main>
     <%- include('partials/footer') %>
+    <script>
+  document.getElementById('connectWallet').addEventListener('click', async () => {
+    if (window.ethereum) {
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const select = document.getElementById('ethAddressSelect');
+        select.innerHTML = '<option value="">Select Wallet Address</option>'; // Reset options
+
+        accounts.forEach(account => {
+          const option = document.createElement('option');
+          option.value = account;
+          option.textContent = account;
+          select.appendChild(option);
+        });
+
+        // Auto-select the first one for convenience
+        if (accounts.length > 0) {
+          select.value = accounts[0];
+        }
+
+      } catch (err) {
+        console.error('Wallet connection failed:', err);
+        alert('Failed to connect to MetaMask');
+      }
+    } else {
+      alert('MetaMask is not installed!');
+    }
+  });
+</script>
 </body>
 </html>
