@@ -29,17 +29,30 @@
         <div class="container mt-5">
             <h1 class="text-center mb-4">Admin Dashboard</h1>
 
-            <!-- Company Details Section -->
-            <h2 class="mb-3">Company Details</h2>
-            <% if (companies.length> 0) { %>
-                <div class="table-responsive">
-                    <table class="table table-bordered table-striped">
-                        <thead class="table-dark">
+
+        
+        <h2 class="mb-3">Company Details</h2>
+        <% if (companies.length > 0) { %>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Company Name</th>
+                            <th>Email</th>
+                            <th>Address</th>
+                            <th>Website</th>
+                            <th>Wallet</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% companies.forEach(company => { %>
                             <tr>
-                                <th>Company Name</th>
-                                <th>Email</th>
-                                <th>Address</th>
-                                <th>Website</th>
+                                <td><%= company.companyDetails.name %></td>
+                                <td><%= company.email %></td>
+                                <td><%= company.companyDetails.address %></td>
+                                <td><%= company.companyDetails.website %></td>
+                                <td><%= company.companyDetails.walletaddress %></td>
+
                             </tr>
                         </thead>
                         <tbody>
@@ -66,42 +79,55 @@
                     <p class="text-muted">No companies available.</p>
                     <% } %>
 
-                        <!-- Consumer Complaints Section -->
-                        <h2 class="mt-5 mb-3">Consumer Complaints</h2>
-                        <% if (complaints.length> 0) { %>
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-striped">
-                                    <thead class="table-dark">
-                                        <tr>
-                                            <th>Consumer Name</th>
-                                            <th>Consumer Email</th>
-                                            <th>Company Name</th>
-                                            <th>Complaint</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <% complaints.forEach(complaint=> { %>
-                                            <tr>
-                                                <td>
-                                                    <%= complaint.consumerId.name %>
-                                                </td>
-                                                <td>
-                                                    <%= complaint.consumerId.email %>
-                                                </td>
-                                                <td>
-                                                    <%= complaint.companyId.companyDetails.name %>
-                                                </td>
-                                                <td>
-                                                    <%= complaint.description %>
-                                                </td>
-                                            </tr>
-                                            <% }) %>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <% } else { %>
-                                <p class="text-muted">No complaints available.</p>
-                                <% } %>
+        
+        <h2 class="mt-5 mb-3">Consumer Complaints</h2>
+        <% if (complaints.length > 0) { %>
+          <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+              <thead class="table-dark">
+                <tr>
+                  <th>Consumer Name</th>
+                  <th>Consumer Email</th>
+                  <th>Company Name</th>
+                  <th>Complaint</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% complaints.forEach(complaint => { %>
+                  <tr>
+                    <td>
+                      <%= complaint.consumerId && complaint.consumerId.name
+                            ? complaint.consumerId.name
+                            : 'N/A' %>
+                    </td>
+                    <td>
+                      <%= complaint.consumerId && complaint.consumerId.email
+                            ? complaint.consumerId.email
+                            : 'N/A' %>
+                    </td>
+                    <td>
+                      <%= complaint.companyId
+                           && complaint.companyId.companyDetails
+                           && complaint.companyId.companyDetails.name
+                           ? complaint.companyId.companyDetails.name
+                           : 'N/A' %>
+                    </td>
+                    <td>
+                      <%= complaint.description %>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        <% } else { %>
+          <p class="text-muted">No complaints available.</p>
+        <% } %>
+
+        <!-- Blockchain Information Section -->
+        <h2 class="mt-5 mb-3">Blockchain Information</h2>
+        <a href="/admin/showblockinfo" class="btn btn-primary">View Blockchain Info</a>
+
 
                                     <!-- Blockchain Information Section -->
                                     <h2 class="mt-5 mb-3">Blockchain Information</h2>

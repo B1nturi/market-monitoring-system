@@ -24,6 +24,7 @@ router.post('/signup', async (req, res) => {
             role: req.body.role,
             email: req.body.email,
             phone: req.body.phone,
+            walletaddress: req.body.walletaddress,
             status: req.body.status || 'active',
             companyDetails: req.body.role === 'company' ? req.body.companyDetails : undefined
         });
