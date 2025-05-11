@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error</title>
+    <!-- Bootstrap CSS -->
+    <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <%- include('partials/header') %>
+
+    <div class="container mt-5">
+        <div class="text-center">
+            <!-- <h1 class="display-4 text-danger">Error <%= errorCode %></h1>
+            <p class="lead text-muted"><%= errorMessage %></p>
+            <a href="/" class="btn btn-primary mt-3">Go to Homepage</a> -->
+            <!-- <h1 class="display-4 text-danger">Error</h1>
+            <p class="lead text-muted"></p>
+            <a href="/" class="btn btn-primary mt-3">Go to Homepage</a> -->
+            <h1 class="display-4 text-danger">An Error Occurred</h1>
+            <p class="lead text-muted">Something went wrong. Please try again later.</p>
+            <a href="/" class="btn btn-primary mt-3">Go to Homepage</a>
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>
+</body>
+</html>

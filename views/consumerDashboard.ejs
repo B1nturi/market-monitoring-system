@@ -4,40 +4,57 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Consumer Dashboard</title>
-    <link rel="stylesheet" href="/path/to/your/css/styles.css">
+    <!-- Bootstrap CSS -->
+    <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        html, body {
+            height: 100%;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+        main {
+            flex: 1;
+        }
+    </style>
 </head>
 <body>
     <%- include('partials/header') %>
 
-    <h1>Consumer Dashboard</h1>
+    <div class="container mt-4">
+        <h1 class="text-center">Consumer Dashboard</h1>
 
-    <h2>My Complaints</h2>
-    <% if (complaints.length > 0) { %>
-        <table>
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Description</th>
-                    <th>Company</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% complaints.forEach(complaint => { %>
+        <h2 class="mt-4">My Complaints</h2>
+        <% if (complaints.length > 0) { %>
+            <table class="table table-striped">
+                <thead>
                     <tr>
-                        <td><%= complaint.title %></td>
-                        <td><%= complaint.description %></td>
-                        <td><%= complaint.companyId.companyDetails.name %></td>
-                        <td><%= complaint.status %></td>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Company</th>
+                        <th>Status</th>
                     </tr>
-                <% }) %>
-            </tbody>
-        </table>
-    <% } else { %>
-        <p>No complaints available.</p>
-    <% } %>
+                </thead>
+                <tbody>
+                    <% complaints.forEach(complaint => { %>
+                        <tr>
+                            <td><%= complaint.title %></td>
+                            <td><%= complaint.description %></td>
+                            <td><%= complaint.companyId.companyDetails.name %></td>
+                            <td><%= complaint.status %></td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        <% } else { %>
+            <p class="text-muted">No complaints available.</p>
+        <% } %>
 
-    <button><a href="/consumer/submit-complaint">Submit Complaint</a></button>
+        <div class="mt-4">
+            <a href="/consumer/submit-complaint" class="btn btn-primary">Submit Complaint</a>
+        </div>
+    </div>
 
     <%- include('partials/footer') %>
 </body>
