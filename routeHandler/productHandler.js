@@ -12,7 +12,7 @@ const Product = mongoose.model('Product', productSchema);
 const generateProductID = (companyID, productName, batchNumber) => {
     const cleanName = productName.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
     
-    return `'${companyID}'-'${batchNumber}'-'${cleanName}'`;
+    return `${companyID}${batchNumber}${cleanName}`;
 };
 
 // Add this route to render the add product form
@@ -40,7 +40,6 @@ router.post('/create', authenticateCompany, async (req, res) => {
 
         // Generate unique product ID
         const productID = generateProductID(actualCompanyId, productName, batchNumber);
-        console.log(productID);
 
         // Check if product ID already exists
         const existingProduct = await Product.findOne({ productID });
@@ -136,18 +135,15 @@ router.get('/id/:productID', async (req, res) => {
 });
 
 // put product by ID
-router.put('/:productID', authenticateCompany, async (req, res) => {
+router.post('/edit/:productID', authenticateCompany, async (req, res) => {
     try {
         const token = req.cookies.token;
         if (!token) {
             return res.status(401).json({ error: 'Please login to continue' });
         }
-
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const companyId = decoded.userId;
         
-        companyID = await Product.find({ companyId });
-
+        const { productID } = req.params;
+        console.log('Product ID:', productID);
         const updates = {
             ...req.body,
             updatedAt: Date.now()
@@ -155,8 +151,7 @@ router.put('/:productID', authenticateCompany, async (req, res) => {
 
         const product = await Product.findOneAndUpdate(
             { 
-                productID: req.params.productID,
-                companyId
+                productID: productID
             },
             updates,
             { new: true }
@@ -178,19 +173,15 @@ router.put('/:productID', authenticateCompany, async (req, res) => {
 
 
 // Delete product (only by owning company)
-router.delete('/:productID', authenticateCompany, async (req, res) => {
+router.post('/delete/:productID', authenticateCompany, async (req, res) => {
     try {
         const token = req.cookies.token;
         if (!token) {
             return res.status(401).json({ error: 'Please login to continue' });
         }
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const companyId = decoded.userId;
-
         const product = await Product.findOneAndDelete({ 
-            productID: req.params.productID,
-            companyId
+            productID: req.params.productID
         });
         
         if (!product) {
