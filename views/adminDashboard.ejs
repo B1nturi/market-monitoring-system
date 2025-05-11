@@ -1,34 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
     <style>
-        html,
-        body {
+        html, body {
             height: 100%;
         }
-
         body {
             display: flex;
             flex-direction: column;
         }
-
         main {
             flex: 1;
         }
     </style>
 </head>
-
 <body>
     <%- include('partials/header') %>
 
-        <div class="container mt-5">
-            <h1 class="text-center mb-4">Admin Dashboard</h1>
-
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Admin Dashboard</h1>
 
         
         <h2 class="mb-3">Company Details</h2>
@@ -52,32 +46,14 @@
                                 <td><%= company.companyDetails.address %></td>
                                 <td><%= company.companyDetails.website %></td>
                                 <td><%= company.companyDetails.walletaddress %></td>
-
                             </tr>
-                        </thead>
-                        <tbody>
-                            <% companies.forEach(company=> { %>
-                                <tr>
-                                    <td>
-                                        <%= company.companyDetails.name %>
-                                    </td>
-                                    <td>
-                                        <%= company.email %>
-                                    </td>
-                                    <td>
-                                        <%= company.companyDetails.address %>
-                                    </td>
-                                    <td>
-                                        <%= company.companyDetails.website %>
-                                    </td>
-                                </tr>
-                                <% }) %>
-                        </tbody>
-                    </table>
-                </div>
-                <% } else { %>
-                    <p class="text-muted">No companies available.</p>
-                    <% } %>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        <% } else { %>
+            <p class="text-muted">No companies available.</p>
+        <% } %>
 
         
         <h2 class="mt-5 mb-3">Consumer Complaints</h2>
@@ -128,12 +104,6 @@
         <h2 class="mt-5 mb-3">Blockchain Information</h2>
         <a href="/admin/showblockinfo" class="btn btn-primary">View Blockchain Info</a>
 
-
-                                    <!-- Blockchain Information Section -->
-                                    <h2 class="mt-5 mb-3">Blockchain Information</h2>
-                                    <a href="/admin/showblockinfo" class="btn btn-primary">View Blockchain Info</a>
-        </div>
     <%- include('partials/footer') %>
 </body>
-
 </html>
