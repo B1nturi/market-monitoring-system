@@ -36,7 +36,8 @@ const userSchema = new mongoose.Schema({
         name: String,
         registrationNumber: String,
         address: String,
-        website: String
+        website: String,
+        walletaddress: String
     },
     createdAt: {
         type: Date,
