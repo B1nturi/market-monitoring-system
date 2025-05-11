@@ -23,14 +23,23 @@
         <!-- Hidden fields -->
         <input type="hidden" name="companyId" value="<%= companyId %>" />
         <input type="hidden" name="transactionHash" id="txHash" />
+        <input type="hidden" name="productOrigin" id="productOrigin" />
 
         <!-- Product -->
         <div class="mb-3">
           <label for="productID" class="form-label">Product:</label>
-          <select id="productID" name="productID" class="form-select" required>
+          <select
+            id="productID"
+            name="productID"
+            class="form-select"
+            required
+          >
             <option value="">Select a product</option>
             <% products.forEach(prod => { %>
-            <option value="<%= prod.productID %>">
+            <option
+              value="<%= prod.productID %>"
+              data-origin="<%= prod.manufacturer %>"
+            >
               <%= prod.productName %>
             </option>
             <% }) %>
@@ -40,8 +49,15 @@
 
         <!-- To Company -->
         <div class="mb-3">
-          <label for="toCompany" class="form-label">To Company / Source:</label>
-          <select id="toCompany" name="toCompany" class="form-select" required>
+          <label for="toCompany" class="form-label"
+            >To Company / Source:</label
+          >
+          <select
+            id="toCompany"
+            name="toCompany"
+            class="form-select"
+            required
+          >
             <option value="">Select a recipient</option>
             <% toCompanies.forEach(c => { %>
             <option
@@ -52,7 +68,9 @@
             </option>
             <% }) %>
           </select>
-          <div class="invalid-feedback">Please select a company/source.</div>
+          <div class="invalid-feedback">
+            Please select a company/source.
+          </div>
         </div>
 
         <!-- Selling Price -->
@@ -85,8 +103,11 @@
         </div>
 
         <div class="d-flex justify-content-between">
-          <!-- note type="button" -->
-          <button id="submitBtn" type="button" class="btn btn-primary">
+          <button
+            id="submitBtn"
+            type="button"
+            class="btn btn-primary"
+          >
             Submit
           </button>
           <button
@@ -105,11 +126,22 @@
     <script>
       (async () => {
         const contractAddress = "0xCb6DEFdBD93a6ae3149c1149029BB26981919e06";
-        const abi = <%- abi %>;
-        const form = document.getElementById("metricsForm");
-        const submitBtn = document.getElementById("submitBtn");
-      console.log("Form loaded");
+        const abi             = <%- abi %>;
+        const form            = document.getElementById("metricsForm");
+        const submitBtn       = document.getElementById("submitBtn");
+        const productSelect   = document.getElementById("productID");
+        const originInput     = document.getElementById("productOrigin");
+
+        // update hidden productOrigin on product change
+        productSelect.addEventListener("change", () => {
+          const opt = productSelect.selectedOptions[0];
+          originInput.value = opt?.dataset.origin || "";
+          console.log("productOrigin set to:", originInput.value);
+        });
+
+        console.log("Form loaded");
         console.log("Contract Address:", contractAddress);
+
         submitBtn.addEventListener("click", async () => {
           // Bootstrap validation
           if (!form.checkValidity()) {
@@ -123,40 +155,52 @@
 
           // Log every field/value
           console.group("🔍 Form submission data");
-          Object.entries(data).forEach(([k,v]) => console.log(k, ":", v));
+          Object.entries(data).forEach(([k, v]) => console.log(k, ":", v));
           console.groupEnd();
 
-          // Grab the on‐chain recipient address
-          const toOpt   = document.getElementById("toCompany").selectedOptions[0];
-          const toWallet = toOpt.dataset.wallet;  // now valid 0x…
+          // Grab recipient wallet
+          const toOpt   = document
+            .getElementById("toCompany")
+            .selectedOptions[0];
+          const toWallet = toOpt.dataset.wallet;
           console.log("toWallet:", toWallet);
+
+          if (!ethers.isAddress(contractAddress)) {
+            return alert("Invalid contract address");
+          }
+          if (!ethers.isAddress(toWallet)) {
+            return alert("Invalid recipient address");
+          }
           if (!window.ethereum) {
             return alert("MetaMask not found.");
           }
-          await window.ethereum.request({ method: "eth_requestAccounts" });
+
+          await window.ethereum.request({
+            method: "eth_requestAccounts"
+          });
 
           const provider = new ethers.BrowserProvider(window.ethereum);
-          const signer = await provider.getSigner();
-          const contract = new ethers.Contract(contractAddress, abi, signer);
-
-          //! Collect form data
-          // const fd = new FormData(form);
-          // const data = Object.fromEntries(fd.entries());
-          // const toWallet = document
-          //   .getElementById("toCompany")
-          //   .selectedOptions[0]
-          //   .dataset.wallet;
+          const signer   = await provider.getSigner();
+          const contract = new ethers.Contract(
+            contractAddress,
+            abi,
+            signer
+          );
 
           // BigNumbers
-          const qty = data.quantityBought;
-          const price = data.sellingPrice;
+          const price = 
+            data.sellingPrice
+          ;
+          const qty = 
+            data.quantityBought.toString()
+          ;
 
           let receipt;
           try {
             const tx = await contract.recordProductMetric(
               data.companyId,
               data.productID,
-              data.productOrigin || "",
+              data.productOrigin,
               toWallet,
               data.toCompany,
               price,
@@ -164,14 +208,14 @@
             );
             receipt = await tx.wait();
             if (receipt.status !== 1) {
-              throw new Error("Tx reverted");
+              throw new Error("Transaction reverted");
             }
           } catch (err) {
             console.error(err);
             return alert("Blockchain transaction failed.");
           }
 
-          // Write txHash and submit
+          // Write txHash and submit form
           document.getElementById("txHash").value =
             receipt.transactionHash;
           form.submit();
