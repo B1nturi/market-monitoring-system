@@ -1,72 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <!-- Use Bootstrap CSS from node_modules -->
+    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 
     <style>
         body {
-            font-family: 'Poppins', sans-serif; /* Custom font */
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #edf2f7, #e2e8f0);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .bg-light-custom {
-            background-color: #f8f9fa; /* Light Grey background */
+        .container {
+            max-width: 500px;
+            width: 100%;
+            padding: 2rem;
+            background: linear-gradient(135deg, #ffffff, #f9fafb);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
         }
 
-        .card-custom {
-            background-color: #ffffff; /* White background for card */
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Light shadow */
+        .card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: none;
         }
 
-        .card-header-custom {
-            background-color: #ffffff; /* White background for header */
-            border-bottom: 1px solid #ddd; /* Light border for header */
+        .card-header {
+            background-color: #ffffff;
+            border-bottom: none;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
         }
 
-        .btn-custom {
-            background-color: #28a745; /* Green button color */
-            border-color: #28a745;
+        .form-control {
+            border-radius: 10px;
+            border: 1px solid #cbd5e0;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #3182ce;
+            box-shadow: 0 0 8px rgba(49, 130, 206, 0.5);
+        }
+
+        .btn-primary {
+            background-color: #3182ce;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
             color: white;
         }
 
-        .btn-custom:hover {
-            background-color: #218838;
-            border-color: #1e7e34;
-        }
-
-        .footer-link {
-            color: #28a745;
-            font-weight: 600;
-            text-decoration: none;
-        }
-
-        .footer-link:hover {
-            text-decoration: underline;
-        }
-
-        .form-control-custom {
-            border-radius: 4px;
-            box-shadow: none; /* Remove box shadow for inputs */
-            border: 1px solid #ced4da; /* Light border for inputs */
-        }
-
-        .form-label-custom {
-            font-weight: 500;
-            color: #495057;
-        }
-
-        .text-center-custom {
-            text-align: center;
-            color: #495057;
+        .btn-primary:hover {
+            background-color: #2b6cb0;
+            transform: translateY(-2px);
         }
 
         .signup-link {
-            color: #28a745;
+            color: #3182ce;
             font-weight: 600;
             text-decoration: none;
         }
@@ -74,39 +80,38 @@
         .signup-link:hover {
             text-decoration: underline;
         }
+
+        .text-danger {
+            font-size: 0.9rem;
+        }
     </style>
 </head>
-<body class="bg-light-custom d-flex flex-column min-vh-100">
-    <main class="flex-grow-1 d-flex justify-content-center align-items-center">
-        <div class="container">
-            <div class="row">
-                <div class="col-9 col-lg-4 mx-auto">
-                    <div class="card card-custom">
-                        <div class="card-header card-header-custom text-center my-3 border-none">
-                            <h1 class="fs-3">Market Monitoring System</h1>
-                        </div>
-                        <div class="card-body col-10 col-lg-9 mx-auto">
-                            <form action="./login" method="POST">
-                                <div class="mb-3">
-                                    <input type="text" id="username" name="username" class="form-control form-control-custom" placeholder="Username" required>
-                                </div>
-                                <div class="mb-3">
-                                    <input type="password" id="password" name="password" class="form-control form-control-custom" placeholder="Password" required>
-                                </div>
-                                <button type="submit" class="btn btn-custom w-100">Login</button>
-                            </form>
-                            <% if (typeof error !== 'undefined') { %>
-                                <p class="text-danger text-center mt-3"><%= error %></p>
-                            <% } %>
-                        </div>
-                        <div class="text-center bg-light my-4">
-                            <p class="mb-2">Don't have an account? <a href="/user/signup" class="signup-link">Sign Up</a></p>
-                        </div>
+
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                Market Monitoring System
+            </div>
+            <div class="card-body">
+                <form action="./login" method="POST">
+                    <div class="mb-3">
+                        <input type="text" id="username" name="username" class="form-control" placeholder="Username" required>
                     </div>
-                </div>
+                    <div class="mb-3">
+                        <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Login</button>
+                </form>
+                <% if (typeof error !== 'undefined') { %>
+                    <p class="text-danger text-center mt-3"><%= error %></p>
+                <% } %>
+            </div>
+            <div class="card-footer text-center bg-light">
+                <p class="mb-0">Don't have an account? <a href="/user/signup" class="signup-link">Sign Up</a></p>
             </div>
         </div>
-    </main>
-    <%- include('partials/footer') %>
+    </div>
 </body>
+
 </html>
