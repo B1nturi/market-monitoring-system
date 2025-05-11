@@ -9,10 +9,10 @@ const { authenticateCompany, authenticateAdmin } = require('../middlewares/authM
 const Product = mongoose.model('Product', productSchema);
 
 // Helper function to generate product ID
-const generateProductID = (companyID, productName) => {
+const generateProductID = (companyID, productName, batchNumber) => {
     const cleanName = productName.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
     
-    return `'${companyID}'|'${cleanName}'`;
+    return `'${companyID}'-'${batchNumber}'-'${cleanName}'`;
 };
 
 // Add this route to render the add product form
@@ -23,7 +23,7 @@ router.get('/add', authenticateCompany, (req, res) => {
 // Create a new product
 router.post('/create', authenticateCompany, async (req, res) => {
     try {
-        const { productName, manufacturer, basePrice } = req.body;
+        const { productName, batchNumber, manufacturer, basePrice, quantity  } = req.body;
         
         const companyId = req.cookies.token;
 
@@ -34,12 +34,12 @@ router.post('/create', authenticateCompany, async (req, res) => {
         const decoded = jwt.verify(companyId, process.env.JWT_SECRET);
         const actualCompanyId = decoded.userId;
 
-        if (!productName || !manufacturer || !basePrice) {
+        if (!productName || !batchNumber || !manufacturer || !basePrice || !quantity) {
             return res.status(400).json({ error: 'Missing required fields' });
         }
 
         // Generate unique product ID
-        const productID = generateProductID(actualCompanyId, productName);
+        const productID = generateProductID(actualCompanyId, productName, batchNumber);
         console.log(productID);
 
         // Check if product ID already exists
@@ -52,16 +52,15 @@ router.post('/create', authenticateCompany, async (req, res) => {
         const newProduct = new Product({
             productID,
             productName,
+            batchNumber,
             manufacturer,
             basePrice,
+            quantity,
             companyId: actualCompanyId
         });
 
         await newProduct.save();
-        res.status(201).json({ 
-            message: 'Product created successfully',
-            product: newProduct 
-        });
+        res.redirect('/company/dashboard');
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Error creating product' });

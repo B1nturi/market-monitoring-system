@@ -57,7 +57,11 @@ auth.authenticateAdmin = async (req, res, next) => {
         // Get token from cookies
         const token = req.cookies?.token;
         if (!token) {
-            return res.status(401).json({ error: 'No token provided' });
+            // Render the errorHandler page with a 401 error
+            return res.status(401).render('errorHandler', {
+                errorCode: 401,
+                errorMessage: 'Unauthorized access. No token provided.'
+            });
         }
 
         // Verify token

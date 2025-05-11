@@ -24,11 +24,12 @@ router.post('/signup', async (req, res) => {
             role: req.body.role,
             email: req.body.email,
             phone: req.body.phone,
+            walletaddress: req.body.walletaddress,
             status: req.body.status || 'active',
             companyDetails: req.body.role === 'company' ? req.body.companyDetails : undefined
         });
         await newUser.save();
-        res.status(201).json({ message: 'User added successfully' });
+        res.status(201).render('login',{ message: 'User added successfully' });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "There was an error while adding the user"});
