@@ -98,12 +98,14 @@ router.post('/submit-product', authenticateCompany, async (req, res) => {
             return res.status(404).json({ error: 'Product not found' });
         }
 
+
         // 3) Generate your composite product ID
         const newProductID = generateProductID(
             toCompany,
             product.productName,
             product.batchNumber
         );
+
 
         // 4) Save ProductMetrics
         const newProductMetrics = new ProductMetrics({
@@ -116,7 +118,9 @@ router.post('/submit-product', authenticateCompany, async (req, res) => {
         });
         await newProductMetrics.save();
 
+
         // 5) Save the actual Product record under the new ID
+
         const newProduct = new Product({
             productID: newProductID,
             productName: product.productName,
@@ -127,9 +131,7 @@ router.post('/submit-product', authenticateCompany, async (req, res) => {
             companyId: toCompany
         });
         await newProduct.save();
-
         const blockchain = req.app.locals.blockchain;
-        
 
         await blockchain.addBlock(newProduct);
 
