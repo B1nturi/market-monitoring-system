@@ -15,6 +15,13 @@ const User = mongoose.model('User', userSchema);
 const Product = mongoose.model('Product', product);
 const Block = mongoose.model('Block', block);
 
+// Helper function to generate product ID
+const generateProductID = (companyID, productName, batchNumber) => {
+    const cleanName = productName.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+    
+    return `'${companyID}'-'${batchNumber}'-'${cleanName}'`;
+};
+
 // Add this route to fetch company details and products
 router.get('/dashboard', authenticateCompany, async (req, res) => {
     try {
@@ -66,7 +73,11 @@ router.post('/submit-product', authenticateCompany, async (req, res) => {
             return res.status(403).json({ error: 'You can only submit data for your own company.' });
         }
 
-        const newProduct = new ProductMetrics({
+        // Generate unique product ID
+        const newProductID = generateProductID(actualCompanyId, productName, batchNumber);
+        console.log(productID);
+
+        const newProductMetrics = new ProductMetrics({
             companyId,
             productID,
             productOrigin,
@@ -75,7 +86,18 @@ router.post('/submit-product', authenticateCompany, async (req, res) => {
             quantityBought
         });
 
-        await newProduct.save();
+        //  const newProduct = new Product({
+        //     productID,
+        //     productName,
+        //     batchNumber,
+        //     manufacturer,
+        //     basePrice,
+        //     quantity,
+        //     companyId: actualCompanyId
+        // });
+
+        await newProductMetrics.save();
+        // await newProduct.save();
 
         const blockchain = new Blockchain();
         // Get the last block from the database

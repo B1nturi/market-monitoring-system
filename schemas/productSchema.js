@@ -10,12 +10,20 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    batchNumber: {
+        type: String,
+        required: true
+    },
     manufacturer: {
         type: String, 
         required: true
     },
     basePrice: {
         type: Number,  // Price the company pays for the product
+        required: true
+    },
+    quantity: {
+        type: Number,
         required: true
     },
     companyId: {
@@ -29,7 +37,7 @@ const productSchema = new mongoose.Schema({
     },
     updatedAt: {
         type: Date,
-        default: Date.now
+        default: null
     }
 });
 
