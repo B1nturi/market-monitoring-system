@@ -209,5 +209,16 @@ router.get('/showmetrics', authenticateAdmin, (req, res) => {
   });
 });
 
+router.post('/updateComplaintStatus', async (req, res) => {
+    const { complaintId, status } = req.body;
+    try {
+        await Complaint.findByIdAndUpdate(complaintId, { status });
+        res.redirect('/admin/dashboard'); // Redirect back to the dashboard
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error updating complaint status');
+    }
+});
+
 // Export the router
 module.exports = router;
