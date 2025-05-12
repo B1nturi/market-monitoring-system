@@ -5,11 +5,12 @@ const router = express.Router();
 const userSchema = require('../schemas/userSchema'); // User Schema
 const complaintSchema = require('../schemas/complaintSchema'); // Complaint Schema
 const blockSchema = require('../schemas/block'); // Block Schema
+const abi = require('../public/json/abi.json'); // ABI for smart contract
 const productMetricsSchema = require('../schemas/productMetricsSchema');
 const productSchema        = require('../schemas/productSchema');
 const ProductMetrics       = mongoose.model('ProductMetrics', productMetricsSchema);
 const Product              = mongoose.model('Product', productSchema);
-
+require('dotenv').config();
 // Models
 const User = mongoose.model('User', userSchema);
 const Complaint = mongoose.model('Complaint', complaintSchema);
@@ -117,6 +118,19 @@ router.get('/companies', authenticateAdmin, async (req, res) => {
     }
 });
 
+// Get all company details (Admin only)
+router.get('/company/:id/json', authenticateAdmin, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id)
+      .select('-password')
+      .lean();
+    if (!user) return res.status(404).json({ error: 'Not found' });
+    res.json(user);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 // Get all consumer complaints (Admin only)
 router.get('/complaints', authenticateAdmin, async (req, res) => {
     try {
@@ -185,6 +199,14 @@ router.get('/productmetrics', authenticateAdmin, async (req, res) => {
     console.error(err);
     res.status(500).send('Server Error');
   }
+});
+
+// Route to render the showMetrics page
+router.get('/showmetrics', authenticateAdmin, (req, res) => {
+  res.render('showMetrics', {
+    contractAddress: process.env.CONTRACT_ADDRESS,
+    contractABI: abi
+  });
 });
 
 // Export the router
