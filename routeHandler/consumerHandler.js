@@ -4,6 +4,10 @@ const router = express.Router();
 const complaintSchema = require('../schemas/complaintSchema');
 const userSchema = require('../schemas/userSchema');
 const { authenticateConsumer } = require('../middlewares/authMiddleware');
+const productMetricsSchema = require('../schemas/productMetricsSchema');
+const productSchema        = require('../schemas/productSchema');
+const ProductMetrics       = mongoose.model('ProductMetrics', productMetricsSchema);
+const Product              = mongoose.model('Product', productSchema);
 
 // Create a Complaint model
 const Complaint = mongoose.model('Complaint', complaintSchema);
@@ -73,4 +77,59 @@ router.get('/my-complaints', authenticateConsumer, async (req, res) => {
     }
 });
 
+router.get('/productmetrics', authenticateConsumer, async (req, res) => {
+  try {
+    const { productName, batchNumber } = req.query;
+    const pipeline = [
+      // join in product details
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'productID',
+          foreignField: 'productID',
+          as: 'product'
+        }
+      },
+      { $unwind: '$product' }
+    ];
+
+    // optional filters
+    const match = {};
+    if (productName)  match['product.productName'] = productName;
+    if (batchNumber)  match['product.batchNumber'] = batchNumber;
+    if (Object.keys(match).length) pipeline.push({ $match: match });
+
+    // join in company names
+    pipeline.push(
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'companyId',
+          foreignField: '_id',
+          as: 'company'
+        }
+      },
+      { $unwind: '$company' },
+      // shape the output
+      {
+        $project: {
+          _id:           0,
+          productID:     1,
+          productName:   '$product.productName',
+          batchNumber:   '$product.batchNumber',
+          sellingPrice:  1,
+          quantityBought:1,
+          companyName:   '$company.companyDetails.name',
+          createdAt:     1
+        }
+      }
+    );
+
+    const metrics = await ProductMetrics.aggregate(pipeline);
+    res.render('productMetrics', { metrics, productName, batchNumber });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
+  }
+});
 module.exports = router;
