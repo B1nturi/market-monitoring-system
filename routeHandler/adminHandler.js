@@ -145,11 +145,11 @@ router.get('/complaints', authenticateAdmin, async (req, res) => {
 
 
 
-router.get('/productmetrics', authenticateAdmin, async (req, res) => {
+router.get('/productmetrics', authenticateAdmin, async (req, res, next) => {
   try {
     const { productName, batchNumber } = req.query;
     const pipeline = [
-      // join in product details
+      // 1) join in product details
       {
         $lookup: {
           from: 'products',
@@ -161,43 +161,57 @@ router.get('/productmetrics', authenticateAdmin, async (req, res) => {
       { $unwind: '$product' }
     ];
 
-    // optional filters
+    // 2) optional filters
     const match = {};
-    if (productName) match['product.productName'] = productName;
-    if (batchNumber) match['product.batchNumber'] = batchNumber;
+    if (productName)  match['product.productName'] = productName;
+    if (batchNumber)  match['product.batchNumber'] = batchNumber;
     if (Object.keys(match).length) pipeline.push({ $match: match });
 
-    // join in company names
+    // 3) join “from” company
     pipeline.push(
       {
         $lookup: {
           from: 'users',
           localField: 'companyId',
           foreignField: '_id',
-          as: 'company'
+          as: 'fromCompany'
         }
       },
-      { $unwind: '$company' },
-      // shape the output
-      {
-        $project: {
-          _id: 0,
-          productID: 1,
-          productName: '$product.productName',
-          batchNumber: '$product.batchNumber',
-          sellingPrice: 1,
-          quantityBought: 1,
-          companyName: '$company.companyDetails.name',
-          createdAt: 1
-        }
-      }
+      { $unwind: { path: '$fromCompany', preserveNullAndEmptyArrays: true } }
     );
+
+    // 4) join “to” company
+    pipeline.push(
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'toCompanyId',
+          foreignField: '_id',
+          as: 'toCompany'
+        }
+      },
+      { $unwind: { path: '$toCompany', preserveNullAndEmptyArrays: true } }
+    );
+
+    // 5) shape the output
+    pipeline.push({
+      $project: {
+        _id:            0,
+        productID:      1,
+        productName:    '$product.productName',
+        batchNumber:    '$product.batchNumber',
+        sellingPrice:   1,
+        quantityBought: 1,
+        fromCompany:    '$fromCompany.companyDetails.name',
+        toCompany:      '$toCompany.companyDetails.name',
+        createdAt:      1
+      }
+    });
 
     const metrics = await ProductMetrics.aggregate(pipeline);
     res.render('productMetrics', { metrics, productName, batchNumber });
   } catch (err) {
-    console.error(err);
-    res.status(500).send('Server Error');
+    next(err);
   }
 });
 

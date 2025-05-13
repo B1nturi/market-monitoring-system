@@ -1,191 +1,126 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Company Dashboard</title>
-    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
-    <style>
-        html, body {
-            height: 100%;
-            font-family: 'Roboto', sans-serif;
-            background-color: #f3f4f6; /* Light gray background for a clean look */
-        }
-        body {
-            display: flex;
-            flex-direction: column;
-        }
-        main {
-            flex: 1;
-        }
-        .card {
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            background-color: #ffffff; /* White background for cards */
-        }
-        .card-header {
-            background-color: #1e293b; /* Dark navy for headers */
-            color: white;
-            padding: 1rem 1.5rem;
-            font-size: 1.25rem;
-            font-weight: bold;
-        }
-        .card-body {
-            padding: 1.5rem;
-        }
-        .table th, .table td {
-            vertical-align: middle;
-            text-align: center;
-        }
-        .btn {
-            border-radius: 8px;
-            padding: 0.5rem 1rem;
-            font-weight: 600;
-        }
-        .btn-primary {
-            background-color: #2563eb; /* Vibrant blue for primary buttons */
-            border: none;
-        }
-        .btn-primary:hover {
-            background-color: #1d4ed8; /* Darker blue on hover */
-        }
-        .btn-danger {
-            background-color: #dc2626; /* Bright red for danger buttons */
-            border: none;
-        }
-        .btn-danger:hover {
-            background-color: #b91c1c; /* Darker red on hover */
-        }
-        .btn-secondary {
-            background-color: #64748b; /* Neutral gray for secondary buttons */
-            border: none;
-        }
-        .btn-secondary:hover {
-            background-color: #475569; /* Darker gray on hover */
-        }
-        .container {
-            max-width: 1200px;
-        }
-        h1 {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #1e293b; /* Dark navy for headings */
-        }
-        a {
-            text-decoration: none;
-            color: #2563eb; /* Blue for links */
-        }
-        a:hover {
-            color: #1d4ed8; /* Darker blue on hover */
-        }
-        .table-dark {
-            background-color: #1e293b; /* Dark navy for table headers */
-            color: white;
-        }
-        .text-muted {
-            color: #6b7280 !important; /* Muted gray for secondary text */
-        }
-    </style>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Company Dashboard</title>
+  <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css"/>
+  <style>
+    body { font-family: "Roboto", sans-serif; background: #f3f4f6; }
+    .card { border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); background: #fff; }
+    .card-header { background: #1e293b; color: #fff; font-weight: bold; }
+    .detail-row { margin-bottom: 0.75rem; }
+    .detail-label { font-weight: 600; color: #374151; }
+    .detail-value a { color: #3b82f6; text-decoration: none; }
+    .detail-value a:hover { text-decoration: underline; }
+  </style>
 </head>
 <body>
+  <%- include('partials/companyHeader') %>
+<script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <div class="container my-5">
+    <h1 class="mb-4 text-center">Company Dashboard</h1>
 
-    <%- include('partials/header') %>
-
-    <div class="container mt-5">
-        <h1 class="text-center mb-5">Company Dashboard</h1>
-
-        <!-- Company Details Section -->
-        <div class="card mb-4">
-            <div class="card-header">
-                Company Details
-            </div>
-            <div class="card-body">
-                <p><strong>Name:</strong> <%= company.companyDetails.name %></p>
-                <p><strong>Address:</strong> <%= company.companyDetails.address %></p>
-                <p><strong>Website:</strong> <a href="<%= company.companyDetails.website %>" target="_blank" class="text-primary"><%= company.companyDetails.website %></a></p>
-            </div>
+    <!-- Company Details -->
+    <div class="card mb-4">
+      <div class="card-header">Company Details</div>
+      <div class="card-body">
+        <div class="detail-row row">
+          <div class="col-sm-3 detail-label">Name:</div>
+          <div class="col-sm-9 detail-value"><%= company.companyDetails.name %></div>
         </div>
-
-        <!-- Products Section -->
-        <div class="card mb-4">
-            <div class="card-header">
-                Products
-            </div>
-            <div class="card-body">
-                <% if (products.length > 0) { %>
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>Product Name</th>
-                                    <th>Origin</th>
-                                    <th>Base Price</th>
-                                    <th>Quantity</th>
-                                    <!-- <th>Actions</th> -->
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% products.forEach(product => { %>
-                                    <tr>
-                                        <td><%= product.productName %></td>
-                                        <td><%= product.manufacturer %></td>
-                                        <td>$<%= product.basePrice.toFixed(2) %></td>
-                                        <td><%= product.quantity %></td>
-                                        <!-- <td>
-                                            <button class="btn btn-primary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#editModal<%= product.id %>">Edit</button>
-                                            <form action="/product/delete/<%= product.productID %>" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this product?');">
-                                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                                            </form>
-                                        </td> -->
-                                    </tr>
-
-                                    <!-- Edit Modal -->
-                                    <div class="modal fade" id="editModal<%= product.id %>" tabindex="-1" aria-labelledby="editModalLabel<%= product.id %>" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="editModalLabel<%= product.id %>">Edit Product</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                </div>
-                                                <form action="/product/edit/<%= product.productID %>" method="POST">
-                                                    <div class="modal-body">
-                                                        <div class="mb-3">
-                                                            <label for="productName<%= product.id %>" class="form-label">Product Name</label>
-                                                            <input type="text" class="form-control" id="productName<%= product.id %>" name="productName" value="<%= product.productName %>" required>
-                                                        </div>
-                                                        <div class="mb-3">
-                                                            <label for="quantity<%= product.id %>" class="form-label">Quantity</label>
-                                                            <input type="number" class="form-control" id="quantity<%= product.id %>" name="quantity" value="<%= product.quantity %>" required>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                        <button type="submit" class="btn btn-primary">Save Changes</button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                <% }) %>
-                            </tbody>
-                        </table>
-                    </div>
-                <% } else { %>
-                    <p class="text-muted">No products available.</p>
-                <% } %>
-            </div>
+        <div class="detail-row row">
+          <div class="col-sm-3 detail-label">Address:</div>
+          <div class="col-sm-9 detail-value"><%= company.companyDetails.address %></div>
         </div>
-
-        <!-- Action Buttons -->
-        <div class="d-flex justify-content-start mb-5">
-            <a href="/product/add" class="btn btn-primary me-2">Add Product</a>
-            <a href="/company/submit-product" class="btn btn-secondary">Handover Product</a>
+        <div class="detail-row row">
+          <div class="col-sm-3 detail-label">Website:</div>
+          <div class="col-sm-9 detail-value">
+            <a href="<%= company.companyDetails.website %>" target="_blank">
+              <%= company.companyDetails.website %>
+            </a>
+          </div>
         </div>
+        <div class="detail-row row align-items-center">
+          <div class="col-sm-3 detail-label">Registered on Chain:</div>
+          <div class="col-sm-9 detail-value d-flex align-items-center">
+            <span id="registrationStatus">—</span>
+            <button id="checkStatusBtn" class="btn btn-sm btn-secondary ms-3">
+              Check
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <%- include('partials/footer') %>
+    <!-- Products Section (unchanged) -->
+    <div class="card mb-4">
+      <div class="card-header">Products</div>
+      <div class="card-body">
+        <% if (products.length > 0) { %>
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover">
+            <thead class="table-dark">
+              <tr>
+                <th>Product Name</th>
+                <th>Origin</th>
+                <th>Base Price</th>
+                <th>Quantity</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% products.forEach(p => { %>
+              <tr>
+                <td><%= p.productName %></td>
+                <td><%= p.manufacturer %></td>
+                <td>$<%= p.basePrice.toFixed(2) %></td>
+                <td><%= p.quantity %></td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+        <% } else { %>
+          <p class="text-muted">No products available.</p>
+        <% } %>
+      </div>
+    </div>
 
-    <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- Action Buttons -->
+    <div class="d-flex mb-5">
+      <a href="/product/add" class="btn btn-primary me-2">Add Product</a>
+      <a href="/company/submit-product" class="btn btn-secondary">Handover Product</a>
+    </div>
+  </div>
+
+  <%- include('partials/footer') %>
+  <script src="https://cdn.jsdelivr.net/npm/ethers/dist/ethers.umd.min.js"></script>
+  <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const contractAddress = "<%= contractAddress %>";
+    const contractABI     = <%- JSON.stringify(abi) %>;
+    const companyWallet   = "<%= company.companyDetails.walletaddress %>";
+
+    async function checkStatus() {
+      try {
+        await window.ethereum.request({ method:'eth_requestAccounts' });
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer   = await provider.getSigner();
+        const contract = new ethers.Contract(contractAddress, contractABI, signer);
+        const isReg = await contract.isCompany(companyWallet);
+        document.getElementById("registrationStatus").textContent =
+          isReg ? "✅ Registered" : "❌ Not Registered";
+      } catch (e) {
+        console.error("Status check error:", e);
+      }
+    }
+
+    document.getElementById("checkStatusBtn")
+            .addEventListener("click", checkStatus);
+
+    window.addEventListener("load", () => {
+      if (window.ethereum) checkStatus();
+    });
+  </script>
 </body>
 </html>
