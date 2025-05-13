@@ -24,124 +24,99 @@
 </head>
 
 <body>
-<%- include('partials/adminHeader') %>
+    <%- include('partials/adminHeader') %>
 
-    <div class="container mt-5">
-        <h1 class="text-center mb-4">Admin Dashboard</h1>
+        <div class="container mt-5">
+            <h1 class="text-center mb-4">Admin Dashboard</h1>
 
 
-        <h2 class="mb-3">Company Details</h2>
-        <% if (companies.length> 0) { %>
-            <div class="table-responsive">
-                <table class="table table-bordered table-striped">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Company Name</th>
-                            <th>Email</th>
-                            <th>Address</th>
-                            <th>Website</th>
-                            <th>Wallet</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% companies.forEach(company=> { %>
+            <h2 class="mb-3">Company Details</h2>
+            <% if (companies.length> 0) { %>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead class="table-dark">
                             <tr>
-                                <td>
-                                    <%= company.companyDetails.name %>
-                                </td>
-                                <td>
-                                    <%= company.email %>
-                                </td>
-                                <td>
-                                    <%= company.companyDetails.address %>
-                                </td>
-                                <td>
-                                    <%= company.companyDetails.website %>
-                                </td>
-                                <td>
-                                    <%= company.companyDetails.walletaddress %>
-                                </td>
+                                <th>Company Name</th>
+                                <th>Email</th>
+                                <th>Address</th>
+                                <th>Website</th>
+                                <th>Wallet</th>
                             </tr>
-                            <% }) %>
-                    </tbody>
-                </table>
-                <div class="mt-3">
-                    <a href="/admin/isRegistered" class="btn btn-primary me-2">is Company Registered</a>
-                    <a href="/admin/addcompany" class="btn btn-primary me-2">Add Company</a>
-                    <a href="/admin/revokeCompany" class="btn btn-danger">Revoke Company</a>
+                        </thead>
+                        <tbody>
+                            <% companies.forEach(company=> { %>
+                                <tr>
+                                    <td>
+                                        <%= company.companyDetails.name %>
+                                    </td>
+                                    <td>
+                                        <%= company.email %>
+                                    </td>
+                                    <td>
+                                        <%= company.companyDetails.address %>
+                                    </td>
+                                    <td>
+                                        <%= company.companyDetails.website %>
+                                    </td>
+                                    <td>
+                                        <%= company.companyDetails.walletaddress %>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                        </tbody>
+                    </table>
+                    <div class="mt-3">
+                        <a href="/admin/isRegistered" class="btn btn-primary me-2">is Company Registered</a>
+                        <a href="/admin/addcompany" class="btn btn-primary me-2">Add Company</a>
+                        <a href="/admin/revokeCompany" class="btn btn-danger">Revoke Company</a>
+                    </div>
                 </div>
-            </div>
-            <% } else { %>
-                <p class="text-muted">No companies available.</p>
-                <% } %>
+                <% } else { %>
+                    <p class="text-muted">No companies available.</p>
+                    <% } %>
 
 
-                    <h2 class="mt-5 mb-3">Consumer Complaints</h2>
-                    <% if (complaints.length> 0) { %>
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-striped">
-                                <thead class="table-dark">
-                                    <tr>
-                                        <th>Consumer Name</th>
-                                        <th>Consumer Email</th>
-                                        <th>Company Name</th>
-                                        <th>Complaint</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <% complaints.forEach(complaint=> { %>
+                        <h2 class="mt-5 mb-3">Consumer Complaints</h2>
+                        <% if (complaints.length> 0) { %>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped">
+                                    <thead class="table-dark">
                                         <tr>
-                                            <td>
-                                                <%= complaint.consumerId && complaint.consumerId.name ?
-                                                    complaint.consumerId.name : 'N/A' %>
-                                            </td>
-                                            <td>
-                                                <%= complaint.consumerId && complaint.consumerId.email ?
-                                                    complaint.consumerId.email : 'N/A' %>
-                                            </td>
-                                            <td>
-                                                <%= complaint.companyId && complaint.companyId.companyDetails &&
-                                                    complaint.companyId.companyDetails.name ?
-                                                    complaint.companyId.companyDetails.name : 'N/A' %>
-                                            </td>
-                                            <td>
-                                                <%= complaint.description %>
-                                            </td>
-                                            <td>
-                                                <form action="/admin/updateComplaintStatus" method="POST">
-                                                    <input type="hidden" name="complaintId"
-                                                        value="<%= complaint._id %>">
-                                                    <select name="status" class="form-select"
-                                                        onchange="this.form.submit()">
-                                                        <option value="Pending" <%=complaint.status==='Pending'
-                                                            ? 'selected' : '' %>>Pending</option>
-                                                        <option value="Progressing" <%=complaint.status==='Progressing'
-                                                            ? 'selected' : '' %>>Progressing</option>
-                                                        <option value="Resolved" <%=complaint.status==='Resolved'
-                                                            ? 'selected' : '' %>>Resolved</option>
-                                                        <option value="Rejected" <%=complaint.status==='Rejected'
-                                                            ? 'selected' : '' %>>Rejected</option>
-                                                    </select>
-                                                </form>
-                                            </td>
+                                            <th>Company Name</th>
+                                            <th>Complaint</th>
                                         </tr>
-                                        <% }) %>
-                                </tbody>
-                            </table>
-                        </div>
-                        <% } else { %>
-                            <p class="text-muted">No complaints available.</p>
-                            <% } %>
-
-                                <!-- Blockchain Information Section -->
-                                <h2 class="mt-5 mb-3">Blockchain Information</h2>
+                                    </thead>
+                                    <tbody>
+                                        <% complaints.slice(0, 5).forEach(complaint => { %>
+                                            <tr>
+                                                <td>
+                                                    <%= complaint.companyId && complaint.companyId.companyDetails &&
+                                                        complaint.companyId.companyDetails.name ?
+                                                        complaint.companyId.companyDetails.name : 'N/A' %>
+                                                </td>
+                                                <td>
+                                                    <%= complaint.description %>
+                                                </td>
+                                            </tr>
+                                            <% }) %>
+                                    </tbody>
+                                </table>
                                 <div class="d-flex flex-wrap gap-2">
-                                    <a href="/admin/showblockinfo" class="btn btn-primary mb-3">View Blockchain Info</a>
-                                    <!-- <a href="/admin/revokeCompany" class="btn btn-primary mb-3">Revoke Company</a> -->
+                                    <a href="/admin/complaints" class="btn btn-primary mb-3">View all complaints</a>
                                 </div>
-    </div>
-    <%- include('partials/footer') %>
+                            </div>
+                            <% } else { %>
+                                <p class="text-muted">No complaints available.</p>
+                                <% } %>
+
+                                    <!-- Blockchain Information Section -->
+                                    <h2 class="mt-5 mb-3">Blockchain Information</h2>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <a href="/admin/showblockinfo" class="btn btn-primary mb-3">View Blockchain
+                                            Info</a>
+                                    </div>
+        </div>
+        <%- include('partials/footer') %>
 </body>
 
 </html>

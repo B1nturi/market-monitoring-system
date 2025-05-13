@@ -26,7 +26,7 @@ router.get('/dashboard', authenticateAdmin, async (req, res) => {
     const companies = await User.find({ role: 'company' }).select('-password'); // Exclude passwords
 
     // Fetch all complaints
-    const complaints = await Complaint.find().populate('consumerId', 'name email').populate('companyId', 'companyDetails.name');
+    const complaints = await Complaint.find().populate('companyId', 'companyDetails.name');
 
     // Fetch data from Block collection
     // const blocks = await Block.find().sort({ index: -1 }).limit(10); // Example: Fetch latest 10 blocks
@@ -131,18 +131,26 @@ router.get('/company/:id/json', authenticateAdmin, async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+
 // Get all consumer complaints (Admin only)
 router.get('/complaints', authenticateAdmin, async (req, res) => {
   try {
-    const complaints = await Complaint.find().populate('consumerId', 'name email').populate('companyId', 'companyDetails.name');
+    const { status } = req.query; // Get the status filter from the query
+    const filter = status ? { status } : {}; // Apply filter only if status is provided
+    const complaints = await Complaint.find(filter)
+      .populate('consumerId', 'name email') // Populate consumer details
+      .populate('companyId', 'companyDetails.name'); // Populate company details
 
-    res.status(200).json({ message: 'Complaints fetched successfully', data: complaints });
+    res.status(200).render('showComplaints', {
+      message: 'Complaints fetched successfully',
+      data: complaints,
+      status // Pass the current status filter to the view
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Error fetching complaints' });
   }
 });
-
 
 
 router.get('/productmetrics', authenticateAdmin, async (req, res, next) => {
@@ -271,7 +279,7 @@ router.post('/updateComplaintStatus', async (req, res) => {
   const { complaintId, status } = req.body;
   try {
     await Complaint.findByIdAndUpdate(complaintId, { status });
-    res.redirect('/admin/dashboard'); // Redirect back to the dashboard
+    res.redirect('/admin/complaints'); // Redirect back to the dashboard
   } catch (error) {
     console.error(error);
     res.status(500).send('Error updating complaint status');
