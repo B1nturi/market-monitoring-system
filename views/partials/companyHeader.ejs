@@ -25,10 +25,10 @@
         <ul class="navbar-nav ms-auto">
           <!-- Dashboard -->
           <li class="nav-item">
-            <a class="nav-link" href="/admin/dashboard">Dashboard</a>
+            <a class="nav-link" href="/company/dashboard">Dashboard</a>
           </li>
 
-          <!-- Company dropdown -->
+          <!-- Product dropdown -->
           <li class="nav-item dropdown">
             <a
               class="nav-link dropdown-toggle"
@@ -38,57 +38,26 @@
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              Company
+              Product
             </a>
             <ul class="dropdown-menu" aria-labelledby="companyDropdown">
               <li>
-                <a class="dropdown-item" href="/admin/addcompany">
-                  Add Company
+                <a class="dropdown-item" href="/product/add">
+                  Add Product
                 </a>
               </li>
               <li>
-                <a class="dropdown-item" href="/admin/revokeCompany">
-                  Revoke Company
-                </a>
-              </li>
-              <li>
-                <a class="dropdown-item" href="/admin/isRegistered">
-                  Check Registration
+                <a class="dropdown-item" href="/company/submit-product">
+                  Handover Product
                 </a>
               </li>
             </ul>
           </li>
 
-          <!-- Product Metrics -->
-          <li class="nav-item dropdown">
-            <a
-              class="nav-link dropdown-toggle"
-              href="#"
-              id="productDropdown"
-              role="button"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              Product Information
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="productDropdown">
-              <li>
-                <a class="dropdown-item" href="/admin/productMetrics">
-                  Off-Chain Product Metrics
-                </a>
-              </li>
-              <li>
-                <a class="dropdown-item" href="/admin/showMetrics">
-                  On-Chain Product Metrics
-                </a>
-              </li>
-              <li>
-                <a class="dropdown-item" href="/admin/showblockinfo">
-                  Off-Chain Blockchain Information
-                </a>
-              </li>
-            </ul>
+          <li class="nav-item">
+            <a class="nav-link" href="/company/productmetrics">Product Information</a>
           </li>
+          
 
           <!-- Logout -->
           <li class="nav-item">
@@ -99,3 +68,5 @@
     </div>
   </nav>
 </header>
+<!-- <a href="/product/add" class="btn btn-primary me-2">Add Product</a>
+      <a href="/company/submit-product" class="btn btn-secondary">Handover Product</a> -->

@@ -22,7 +22,7 @@ const Block = mongoose.model('Block', block);
 // Helper function to generate product ID
 const generateProductID = (companyID, productName, batchNumber) => {
     const cleanName = productName.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
-    
+
     return `${companyID}${batchNumber}${cleanName}`;
 };
 
@@ -38,7 +38,14 @@ router.get('/dashboard', authenticateCompany, async (req, res) => {
         // Fetch products of the company
         const products = await Product.find({ companyId });
 
-        res.render('companyDashboard', { company, products });
+        const contractAddress = process.env.CONTRACT_ADDRESS;
+        const abi = require('../public/json/abi.json');
+        res.render('companyDashboard', {
+            company,
+            products,
+            contractAddress,
+            abi
+        });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Error while fetching dashboard data' });
@@ -138,8 +145,8 @@ router.post('/submit-product', authenticateCompany, async (req, res) => {
         }
 
         const updateQuantity = await Product.findOneAndUpdate(
-            { 
-            productID: product.productID
+            {
+                productID: product.productID
             },
             { quantity: product.quantity - quantityBought },
             { new: true }
@@ -171,6 +178,77 @@ router.get('/view-submissions', authenticateCompany, async (req, res) => {
         res.status(500).json({ error: 'Error while fetching submissions' });
     }
 });
+
+router.get('/productmetrics', authenticateCompany, async (req, res, next) => {
+  try {
+    const { productName, batchNumber } = req.query;
+    const pipeline = [
+      // 1) join in product details
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'productID',
+          foreignField: 'productID',
+          as: 'product'
+        }
+      },
+      { $unwind: '$product' }
+    ];
+
+    // 2) optional filters
+    const match = {};
+    if (productName)  match['product.productName'] = productName;
+    if (batchNumber)  match['product.batchNumber'] = batchNumber;
+    if (Object.keys(match).length) pipeline.push({ $match: match });
+
+    // 3) join “from” company
+    pipeline.push(
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'companyId',
+          foreignField: '_id',
+          as: 'fromCompany'
+        }
+      },
+      { $unwind: { path: '$fromCompany', preserveNullAndEmptyArrays: true } }
+    );
+
+    // 4) join “to” company
+    pipeline.push(
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'toCompany',
+          foreignField: '_id',
+          as: 'toCompany'
+        }
+      },
+      { $unwind: { path: '$toCompany', preserveNullAndEmptyArrays: true } }
+    );
+
+    // 5) shape the output
+    pipeline.push({
+      $project: {
+        _id:            0,
+        productID:      1,
+        productName:    '$product.productName',
+        batchNumber:    '$product.batchNumber',
+        sellingPrice:   1,
+        quantityBought: 1,
+        fromCompany:    '$fromCompany.companyDetails.name',
+        toCompany:      '$toCompany.companyDetails.name',
+        createdAt:      1
+      }
+    });
+
+    const metrics = await ProductMetrics.aggregate(pipeline);
+    res.render('productMetrics', { metrics, productName, batchNumber });
+  } catch (err) {
+    next(err);
+  }
+});
+
 
 // export the router
 module.exports = router;
