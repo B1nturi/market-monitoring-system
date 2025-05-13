@@ -1,194 +1,270 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Consumer Dashboard</title>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
     <!-- Bootstrap CSS -->
-    <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Bootstrap Icons -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
     <style>
-        html,
-        body {
-            height: 100%;
-            font-family: 'Roboto', sans-serif;
-            background: linear-gradient(135deg, #edf2f7, #e2e8f0);
-        }
+      /* General Styles */
+      html,
+      body {
+        height: 100%;
+        font-family: "Roboto", sans-serif;
+        background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+        color: #2d3748;
+      }
 
-        body {
-            display: flex;
-            flex-direction: column;
-        }
+      body {
+        display: flex;
+        flex-direction: column;
+      }
 
-        .container {
-            max-width: 1200px;
-        }
+      .container {
+        max-width: 1200px;
+        padding: 2rem;
+      }
 
-        .card {
-            border: none;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            background: linear-gradient(135deg, #ffffff, #f9fafb);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            position: relative;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
+      h1,
+      h2 {
+        font-weight: 700;
+        color: #2d3748;
+      }
 
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
-        }
+      h1 {
+        font-size: 2.5rem;
+      }
 
-        .card-header {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #2d3748;
-            background-color: transparent;
-            border-bottom: none;
-        }
+      h2 {
+        font-size: 1.75rem;
+      }
 
-        .card-body {
-            flex: 1;
-        }
+      /* Card Styles */
+      .card {
+        border: none;
+        border-radius: 20px; /* More rounded corners */
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); /* Softer shadow */
+        background: linear-gradient(
+          135deg,
+          #ffffff,
+          #f7f9fc
+        ); /* Subtle gradient */
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        position: relative;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
 
-        .badge {
-            font-size: 0.9rem;
-            padding: 0.5em 0.75em;
-            border-radius: 12px;
-            position: absolute;
-            top: 15px;
-            right: 25px;
-        }
+      .card:hover {
+        transform: translateY(-8px); /* Slight lift on hover */
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15); /* Enhanced shadow on hover */
+      }
 
-        .btn-primary {
-            background-color: #3182ce;
-            border: none;
-            border-radius: 10px;
-            padding: 12px 20px;
-            font-size: 1rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            color: white;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
+      .card-header {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #2d3748;
+        background-color: #f7fafc;
+        padding: 1rem;
+        margin-bottom: 1rem;
+      }
 
-        .btn-primary:hover {
-            background-color: #2b6cb0;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
-        }
+      .card-body {
+        flex: 1;
+        padding: 1.5rem; /* Increased padding for better spacing */
+        color: #4a5568;
+        display: flex;
+        flex-direction: column; /* Make content flexible */
+      }
 
-        .text-muted {
-            font-size: 1rem;
-            color: #718096;
-        }
+      .card p {
+        margin-bottom: 0.75rem; /* Increased spacing between paragraphs */
+        line-height: 1.6;
+      }
 
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #2d3748;
-        }
+      .card p strong {
+        font-weight: 700;
+        color: #2d3748;
+      }
 
-        h2 {
-            font-size: 1.8rem;
-            font-weight: 600;
-            color: #4a5568;
-        }
+      /* Badge Styles */
+      .badge {
+        font-size: 0.8rem;
+        padding: 0.5em 0.8em; /* Slightly larger padding */
+        border-radius: 16px; /* More rounded badges */
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        font-weight: 700;
+        text-transform: uppercase;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add shadow to badges */
+      }
 
-        .empty-state {
-            text-align: center;
-            padding: 2rem;
-            background: #f9fafb;
-            border-radius: 16px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
+      .badge.bg-info {
+        background-color: #63b3ed;
+        color: #ffffff;
+      }
 
-        .empty-state h3 {
-            font-size: 1.5rem;
-            color: #4a5568;
-        }
+      .badge.bg-warning {
+        background-color: #f6ad55;
+        color: #ffffff;
+      }
 
-        .empty-state p {
-            font-size: 1rem;
-            color: #718096;
-        }
+      .badge.bg-success {
+        background-color: #48bb78;
+        color: #ffffff;
+      }
+
+      .badge.bg-danger {
+        background-color: #e53e3e;
+        color: #ffffff;
+      }
+
+      /* Button Styles */
+      .btn-primary {
+        background-color: #3182ce;
+        border: none;
+        border-radius: 12px; /* More rounded buttons */
+        padding: 12px 20px; /* Larger padding for better clickability */
+        font-size: 1rem; /* Slightly larger font size */
+        font-weight: 700;
+        transition: all 0.3s ease;
+        color: white;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add shadow to buttons */
+      }
+
+      .btn-primary:hover {
+        background-color: #2b6cb0;
+        transform: translateY(-2px); /* Slight lift on hover */
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Enhanced shadow on hover */
+      }
+
+      /* Empty State Styles */
+      .empty-state {
+        text-align: center;
+        padding: 2rem;
+        background: #f9fafb;
+        border-radius: 20px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .empty-state h3 {
+        font-size: 1.5rem;
+        color: #4a5568;
+      }
+
+      .empty-state p {
+        font-size: 1rem;
+        color: #718096;
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
     <%- include('partials/header') %>
 
     <div class="container mt-4">
-        <h1 class="text-center mb-5">Consumer Dashboard</h1>
+      <h1 class="text-center mb-5">Consumer Dashboard</h1>
 
-        <div class="row">
-            <!-- Complaints Section -->
-            <div class="col-12">
-                <h2 class="mb-4">My Complaints</h2>
-                <% if (complaints.length > 0) { %>
-                <div class="row">
-                    <% complaints.forEach(complaint => { %>
-                    <div class="col-md-6 col-lg-4 mb-4">
-                        <div class="card">
-                            <!-- Badge on top-right -->
-                            <% if (complaint.status === 'Responded') { %>
-                                <span class="badge bg-info text-dark">Responded</span>
-                            <% } else if (complaint.status === 'Progressing') { %>
-                                <span class="badge bg-warning text-dark">Progressing</span>
-                            <% } else if (complaint.status === 'Resolved') { %>
-                                <span class="badge bg-success">Resolved</span>
-                            <% } else if (complaint.status === 'Rejected') { %>
-                                <span class="badge bg-danger">Rejected</span>
-                            <% } %>
-
-                            <div class="card-header">
-                                <%= complaint.title %>
-                            </div>
-                            <div class="card-body">
-                                <p><strong>Description:</strong> <%= complaint.description %></p>
-                                <p><strong>Company:</strong> <%= complaint.companyId.companyDetails.name %></p>
-                                <% if (complaint.companyResponse && complaint.companyResponse.trim() !== '') { %>
-                                    <p><strong>Response:</strong> <%= complaint.companyResponse %></p>
-                                    <% } %>
-                                    <p><strong>Status:</strong> <%= complaint.status %></p>
-                                    <% if (complaint.status !== 'Resolved') { %>
-                                    <form action="/consumer/resolve-complaint/<%= complaint._id %>" method="POST">
-                                        <button type="submit" class="btn btn-primary btn-sm mt-2">Mark as Resolved</button>
-                                    </form>
-                                    <% } %>
-
-                            </div>
-                        </div>
-                    </div>
-                    <% }) %>
-                </div>
-                <% } else { %>
-                <div class="empty-state">
-                    <h3>No Complaints Available</h3>
-                    <p>You haven't submitted any complaints yet. Click the button below to add one.</p>
-                    <a href="/consumer/submit-complaint" class="btn btn-primary mt-3">Add Complaint</a>
-                </div>
+      <div class="row">
+        <!-- Complaints Section -->
+        <div class="col-12">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>My Complaints</h2>
+            <i
+              class="bi bi-clock-history me-3"
+              style="font-size: 2rem; color: #2d3748"
+            ></i>
+          </div>
+          <% if (complaints.length > 0) { %>
+          <div class="row">
+            <% complaints.forEach(complaint => { %>
+            <div class="col-md-6 col-lg-4 mb-4">
+              <div class="card h-100 position-relative">
+                <!-- Badge on top-right -->
+                <% if (complaint.status === 'Responded') { %>
+                <span class="badge bg-info">Responded</span>
+                <% } else if (complaint.status === 'Progressing') { %>
+                <span class="badge bg-warning">Progressing</span>
+                <% } else if (complaint.status === 'Resolved') { %>
+                <span class="badge bg-success">Resolved</span>
+                <% } else if (complaint.status === 'Rejected') { %>
+                <span class="badge bg-danger">Rejected</span>
                 <% } %>
-            </div>
-        </div>
 
-        <div class="row justify-content-center mt-4">
-            <div class="col-12 text-center">
-                <a href="/consumer/submit-complaint" class="btn btn-primary me-2">Add Complaint</a>
-                <a href="/consumer/productMetrics" class="btn btn-primary">View Your Product INFO</a>
+                <div class="card-header"><%= complaint.title %></div>
+                <div class="card-body">
+                  <p>
+                    <strong>Company:</strong> <%=
+                    complaint.companyId.companyDetails.name %>
+                  </p>
+                  <p>
+                    <strong>Description:</strong> <%= complaint.description %>
+                  </p>
+
+                  <% if (complaint.companyResponse &&
+                  complaint.companyResponse.trim() !== '') { %>
+                  <p>
+                    <strong>Response:</strong> <%= complaint.companyResponse %>
+                  </p>
+                  <% } %> <% if (complaint.status !== 'Resolved') { %>
+                  <form
+                    action="/consumer/resolve-complaint/<%= complaint._id %>"
+                    method="POST"
+                  >
+                    <button
+                      type="submit"
+                      class="btn btn-primary btn-sm mt-auto"
+                    >
+                      Mark as Resolved
+                    </button>
+                  </form>
+                  <% } %>
+                </div>
+              </div>
             </div>
+            <% }) %>
+          </div>
+          <% } else { %>
+          <div class="empty-state">
+            <h3>No Complaints Available</h3>
+            <p>
+              You haven't submitted any complaints yet. Click the button below
+              to add one.
+            </p>
+          </div>
+          <% } %>
         </div>
+      </div>
+
+      <div class="row justify-content-center mt-4">
+        <div class="col-12 text-center">
+          <a href="/consumer/submit-complaint" class="btn btn-primary me-2"
+            >Add Complaint</a
+          >
+          <a href="/consumer/productMetrics" class="btn btn-primary"
+            >View Your Product INFO</a
+          >
+        </div>
+      </div>
     </div>
 
     <%- include('partials/footer') %>
 
     <!-- Bootstrap JS and dependencies -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
-</body>
-
+    <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+  </body>
 </html>
