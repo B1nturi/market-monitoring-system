@@ -21,7 +21,7 @@ const complaintSchema = new mongoose.Schema({
     },
     companyResponse: {
         type: String,
-        required: true
+        required: false
     },
     status: {
         type: String,

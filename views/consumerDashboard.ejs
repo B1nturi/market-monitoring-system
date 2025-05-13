@@ -136,7 +136,7 @@
                         <div class="card">
                             <!-- Badge on top-right -->
                             <% if (complaint.status === 'Responded') { %>
-                                <span class="badge bg-info text-dark">Pending</span>
+                                <span class="badge bg-info text-dark">Responded</span>
                             <% } else if (complaint.status === 'Progressing') { %>
                                 <span class="badge bg-warning text-dark">Progressing</span>
                             <% } else if (complaint.status === 'Resolved') { %>
@@ -151,6 +151,15 @@
                             <div class="card-body">
                                 <p><strong>Description:</strong> <%= complaint.description %></p>
                                 <p><strong>Company:</strong> <%= complaint.companyId.companyDetails.name %></p>
+                                <% if (complaint.companyResponse && complaint.companyResponse.trim() !== '') { %>
+                                    <p><strong>Response:</strong> <%= complaint.companyResponse %></p>
+                                    <% } %>
+                                    <p><strong>Status:</strong> <%= complaint.status %></p>
+                                    <% if (complaint.status !== 'Resolved') { %>
+                                    <form action="/consumer/resolve-complaint/<%= complaint._id %>" method="POST">
+                                        <button type="submit" class="btn btn-primary btn-sm mt-2">Mark as Resolved</button>
+                                    </form>
+                                    <% } %>
 
                             </div>
                         </div>
