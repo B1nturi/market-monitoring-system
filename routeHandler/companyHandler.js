@@ -162,8 +162,15 @@ router.post('/submit-product', authenticateCompany, async (req, res) => {
     }
 
     const base = product.basePrice;
-    const sold = Number(quantityBought) && Number(sellingPrice);
-    if (sold && (sold >= base * 1.45 || sold <= base * 0.55)) {
+    const parsedQuantity = Number(quantityBought);
+    const parsedSellingPrice = Number(sellingPrice);
+
+    if (isNaN(parsedQuantity) || isNaN(parsedSellingPrice)) {
+      return res.status(400).json({ error: 'Invalid quantity or selling price' });
+    }
+
+    const sold = parsedSellingPrice;
+    if (sold >= base * 1.45 || sold <= base * 0.55) {
       const deviation = Math.abs(sold - base);
       await Alert.create({
         metricsId: newProductMetrics._id,
