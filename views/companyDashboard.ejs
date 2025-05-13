@@ -1,98 +1,15 @@
 <!DOCTYPE html>
 
-<html lang="en</div>">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Company Dashboard</title>
     <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css" />
-    <style>
-      html,
-      body {
-        height: 100%;
-        font-family: "Roboto", sans-serif;
-        background-color: #f3f4f6;
-      }
-      body {
-        display: flex;
-        flex-direction: column;
-      }
-      main {
-        flex: 1;
-      }
-      .card {
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        background-color: #ffffff;
-      }
-      .card-header {
-        background-color: #1e293b;
-        color: white;
-        padding: 1rem 1.5rem;
-        font-size: 1.25rem;
-        font-weight: bold;
-      }
-      .card-body {
-        padding: 1.5rem;
-      }
-      .table th,
-      .table td {
-        vertical-align: middle;
-        text-align: center;
-      }
-      .btn {
-        border-radius: 8px;
-        padding: 0.5rem 1rem;
-        font-weight: 600;
-      }
-      .btn-primary {
-        background-color: #2563eb;
-        border: none;
-      }
-      .btn-primary:hover {
-        background-color: #1d4ed8;
-      }
-      .btn-danger {
-        background-color: #dc2626;
-        border: none;
-      }
-      .btn-danger:hover {
-        background-color: #b91c1c;
-      }
-      .btn-secondary {
-        background-color: #64748b;
-        border: none;
-      }
-      .btn-secondary:hover {
-        background-color: #475569;
-      }
-      .container {
-        max-width: 1100px;
-      }
-      h1 {
-        font-size: 2.5rem;
-        font-weight: bold;
-        color: #1e293b;
-      }
-      a {
-        text-decoration: none;
-        color: #2563eb;
-      }
-      a:hover {
-        color: #1d4ed8;
-      }
-      .table-dark {
-        background-color: #1e293b;
-        color: white;
-      }
-      .text-muted {
-        color: #6b7280 !important;
-      }
-    </style>
+    <link rel="stylesheet" href="/css/companyHeader.css" />
   </head>
   <body>
-    <%- include('partials/header') %>
+    <%- include('partials/companyHeader') %>
 
     <div class="container-md container-sm mt-5">
       <h1 class="text-center mb-5">Company Dashboard</h1>
@@ -147,7 +64,7 @@
                 </tr>
 
                 <!-- Edit Modal -->
-                <div
+                <!-- <div
                   class="modal fade"
                   id="editModal<%= product.id %>"
                   tabindex="-1"
@@ -221,7 +138,7 @@
                       </form>
                     </div>
                   </div>
-                </div>
+                </div> -->
                 <% }) %>
               </tbody>
             </table>
@@ -359,9 +276,7 @@
         >
           Add Product
         </button>
-        <a href="/company/submit-product" class="btn btn-secondary"
-          >Handover Product</a
-        >
+        <a href="/company/submit-product" class="btn btn-secondary">Handover Product</a>
       </div>
 
     </div>
@@ -396,8 +311,9 @@
     window.addEventListener("load", () => {
       if (window.ethereum) checkStatus();
     });
-    <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+    
   </script>
+  <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
 
