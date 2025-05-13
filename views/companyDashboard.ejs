@@ -1,191 +1,371 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html lang="en</div>">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Company Dashboard</title>
-    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css" />
     <style>
-        html, body {
-            height: 100%;
-            font-family: 'Roboto', sans-serif;
-            background-color: #f3f4f6; /* Light gray background for a clean look */
-        }
-        body {
-            display: flex;
-            flex-direction: column;
-        }
-        main {
-            flex: 1;
-        }
-        .card {
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            background-color: #ffffff; /* White background for cards */
-        }
-        .card-header {
-            background-color: #1e293b; /* Dark navy for headers */
-            color: white;
-            padding: 1rem 1.5rem;
-            font-size: 1.25rem;
-            font-weight: bold;
-        }
-        .card-body {
-            padding: 1.5rem;
-        }
-        .table th, .table td {
-            vertical-align: middle;
-            text-align: center;
-        }
-        .btn {
-            border-radius: 8px;
-            padding: 0.5rem 1rem;
-            font-weight: 600;
-        }
-        .btn-primary {
-            background-color: #2563eb; /* Vibrant blue for primary buttons */
-            border: none;
-        }
-        .btn-primary:hover {
-            background-color: #1d4ed8; /* Darker blue on hover */
-        }
-        .btn-danger {
-            background-color: #dc2626; /* Bright red for danger buttons */
-            border: none;
-        }
-        .btn-danger:hover {
-            background-color: #b91c1c; /* Darker red on hover */
-        }
-        .btn-secondary {
-            background-color: #64748b; /* Neutral gray for secondary buttons */
-            border: none;
-        }
-        .btn-secondary:hover {
-            background-color: #475569; /* Darker gray on hover */
-        }
-        .container {
-            max-width: 1200px;
-        }
-        h1 {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #1e293b; /* Dark navy for headings */
-        }
-        a {
-            text-decoration: none;
-            color: #2563eb; /* Blue for links */
-        }
-        a:hover {
-            color: #1d4ed8; /* Darker blue on hover */
-        }
-        .table-dark {
-            background-color: #1e293b; /* Dark navy for table headers */
-            color: white;
-        }
-        .text-muted {
-            color: #6b7280 !important; /* Muted gray for secondary text */
-        }
+      html,
+      body {
+        height: 100%;
+        font-family: "Roboto", sans-serif;
+        background-color: #f3f4f6;
+      }
+      body {
+        display: flex;
+        flex-direction: column;
+      }
+      main {
+        flex: 1;
+      }
+      .card {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        background-color: #ffffff;
+      }
+      .card-header {
+        background-color: #1e293b;
+        color: white;
+        padding: 1rem 1.5rem;
+        font-size: 1.25rem;
+        font-weight: bold;
+      }
+      .card-body {
+        padding: 1.5rem;
+      }
+      .table th,
+      .table td {
+        vertical-align: middle;
+        text-align: center;
+      }
+      .btn {
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        font-weight: 600;
+      }
+      .btn-primary {
+        background-color: #2563eb;
+        border: none;
+      }
+      .btn-primary:hover {
+        background-color: #1d4ed8;
+      }
+      .btn-danger {
+        background-color: #dc2626;
+        border: none;
+      }
+      .btn-danger:hover {
+        background-color: #b91c1c;
+      }
+      .btn-secondary {
+        background-color: #64748b;
+        border: none;
+      }
+      .btn-secondary:hover {
+        background-color: #475569;
+      }
+      .container {
+        max-width: 1100px;
+      }
+      h1 {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #1e293b;
+      }
+      a {
+        text-decoration: none;
+        color: #2563eb;
+      }
+      a:hover {
+        color: #1d4ed8;
+      }
+      .table-dark {
+        background-color: #1e293b;
+        color: white;
+      }
+      .text-muted {
+        color: #6b7280 !important;
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <%- include('partials/header') %>
 
-    <div class="container mt-5">
-        <h1 class="text-center mb-5">Company Dashboard</h1>
+    <div class="container-md container-sm mt-5">
+      <h1 class="text-center mb-5">Company Dashboard</h1>
 
-        <!-- Company Details Section -->
-        <div class="card mb-4">
-            <div class="card-header">
-                Company Details
-            </div>
-            <div class="card-body">
-                <p><strong>Name:</strong> <%= company.companyDetails.name %></p>
-                <p><strong>Address:</strong> <%= company.companyDetails.address %></p>
-                <p><strong>Website:</strong> <a href="<%= company.companyDetails.website %>" target="_blank" class="text-primary"><%= company.companyDetails.website %></a></p>
-            </div>
+      <!-- Company Details Section -->
+      <div class="card mb-4">
+        <div class="card-header">Company Details</div>
+        <div class="card-body">
+          <p><strong>Name:</strong> <%= company.companyDetails.name %></p>
+          <p><strong>Address:</strong> <%= company.companyDetails.address %></p>
+          <p>
+            <strong>Website:</strong>
+            <a
+              href="<%= company.companyDetails.website %>"
+              target="_blank"
+              class="text-primary"
+              ><%= company.companyDetails.website %></a
+            >
+          </p>
         </div>
+      </div>
 
-        <!-- Products Section -->
-        <div class="card mb-4">
-            <div class="card-header">
-                Products
-            </div>
-            <div class="card-body">
-                <% if (products.length > 0) { %>
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>Product Name</th>
-                                    <th>Origin</th>
-                                    <th>Base Price</th>
-                                    <th>Quantity</th>
-                                    <!-- <th>Actions</th> -->
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% products.forEach(product => { %>
-                                    <tr>
-                                        <td><%= product.productName %></td>
-                                        <td><%= product.manufacturer %></td>
-                                        <td>$<%= product.basePrice.toFixed(2) %></td>
-                                        <td><%= product.quantity %></td>
-                                        <!-- <td>
+      <!-- Products Section -->
+      <div class="card mb-4">
+        <div class="card-header">Products</div>
+        <div class="card-body">
+          <% if (products.length > 0) { %>
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+              <thead class="table-dark">
+                <tr>
+                  <th>Product Name</th>
+                  <th>Origin</th>
+                  <th>Base Price</th>
+                  <th>Quantity</th>
+                  <!-- <th>Actions</th> -->
+                </tr>
+              </thead>
+              <tbody>
+                <% products.forEach(product => { %>
+                <tr>
+                  <td><%= product.productName %></td>
+                  <td><%= product.manufacturer %></td>
+                  <td>$<%= product.basePrice.toFixed(2) %></td>
+                  <td><%= product.quantity %></td>
+                  <!-- <td>
                                             <button class="btn btn-primary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#editModal<%= product.id %>">Edit</button>
                                             <form action="/product/delete/<%= product.productID %>" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this product?');">
                                                 <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                                             </form>
                                         </td> -->
-                                    </tr>
+                </tr>
 
-                                    <!-- Edit Modal -->
-                                    <div class="modal fade" id="editModal<%= product.id %>" tabindex="-1" aria-labelledby="editModalLabel<%= product.id %>" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="editModalLabel<%= product.id %>">Edit Product</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                </div>
-                                                <form action="/product/edit/<%= product.productID %>" method="POST">
-                                                    <div class="modal-body">
-                                                        <div class="mb-3">
-                                                            <label for="productName<%= product.id %>" class="form-label">Product Name</label>
-                                                            <input type="text" class="form-control" id="productName<%= product.id %>" name="productName" value="<%= product.productName %>" required>
-                                                        </div>
-                                                        <div class="mb-3">
-                                                            <label for="quantity<%= product.id %>" class="form-label">Quantity</label>
-                                                            <input type="number" class="form-control" id="quantity<%= product.id %>" name="quantity" value="<%= product.quantity %>" required>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                        <button type="submit" class="btn btn-primary">Save Changes</button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                <% }) %>
-                            </tbody>
-                        </table>
+                <!-- Edit Modal -->
+                <div
+                  class="modal fade"
+                  id="editModal<%= product.id %>"
+                  tabindex="-1"
+                  aria-labelledby="editModalLabel<%= product.id %>"
+                  aria-hidden="true"
+                >
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5
+                     </div>     class="modal-title"
+                          id="editModalLabel<%= product.id %>"
+                        >
+                          Edit Product
+                        </h5>
+                        <button
+                          type="button"
+                          class="btn-close"
+                          data-bs-dismiss="modal"
+                          aria-label="Close"
+                        ></button>
+                      </div>
+                      <form
+                        action="/product/edit/<%= product.productID %>"
+                        method="POST"
+                      >
+                        <div class="modal-body">
+                          <div class="mb-3">
+                            <label
+                              for="productName<%= product.id %>"
+                              class="form-label"
+                              >Product Name</label
+                            >
+                            <input
+                              type="text"
+                              class="form-control"
+                              id="productName<%= product.id %>"
+                              name="productName"
+                              value="<%= product.productName %>"
+                              required
+                            />
+                          </div>
+                          <div class="mb-3">
+                            <label
+                              for="quantity<%= product.id %>"
+                              class="form-label"
+                              >Quantity</label
+                            >
+                            <input
+                              type="number"
+                              class="form-control"
+                              id="quantity<%= product.id %>"
+                              name="quantity"
+                              value="<%= product.quantity %>"
+                              required
+                            />
+                          </div>
+                        </div>
+                        <div class="modal-footer">
+                          <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal"
+                          >
+                            Close
+                          </button>
+                          <button type="submit" class="btn btn-primary">
+                            Save Changes
+                          </button>
+                        </div>
+                      </form>
                     </div>
-                <% } else { %>
-                    <p class="text-muted">No products available.</p>
-                <% } %>
-            </div>
+                  </div>
+                </div>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+          <% } else { %>
+          <p class="text-muted">No products available.</p>
+          <% } %>
         </div>
+      </div>
 
-        <!-- Action Buttons -->
-        <div class="d-flex justify-content-start mb-5">
-            <a href="/product/add" class="btn btn-primary me-2">Add Product</a>
-            <a href="/company/submit-product" class="btn btn-secondary">Handover Product</a>
+      <!-- Add Product Modal -->
+      <div
+        class="modal fade"
+        id="addProductModal"
+        tabindex="-1"
+        aria-labelledby="addProductModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header bg-dark text-white">
+              <h5 class="modal-title" id="addProductModalLabel">Add Product</h5>
+              <button
+                type="button"
+                class="btn-close btn-close-white"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+              <form
+                action="/product/create"
+                method="POST"
+                class="needs-validation"
+                novalidate
+              >
+                <!-- Product Name -->
+                <div class="mb-3">
+                  <label for="productName" class="form-label fw-bold">Product Name:</label>
+                  <input
+                    type="text"
+                    id="productName"
+                    name="productName"
+                    class="form-control"
+                    placeholder="Enter product name"
+                    required
+                  />
+                  <div class="invalid-feedback">Please enter a product name.</div>
+                </div>
+
+                <!-- Batch Number -->
+                <div class="mb-3">
+                  <label for="batchNumber" class="form-label fw-bold">Batch Number:</label>
+                  <input
+                    type="text"
+                    id="batchNumber"
+                    name="batchNumber"
+                    class="form-control"
+                    placeholder="Enter batch number"
+                    required
+                  />
+                  <div class="invalid-feedback">Please enter batch number.</div>
+                </div>
+
+                <!-- Manufacturer -->
+                <div class="mb-3">
+                  <label for="manufacturer" class="form-label fw-bold">Manufacturer:</label>
+                  <input
+                    type="text"
+                    id="manufacturer"
+                    name="manufacturer"
+                    class="form-control"
+                    placeholder="Enter manufacturer name"
+                    required
+                  />
+                  <div class="invalid-feedback">Please enter the manufacturer name.</div>
+                </div>
+
+                <!-- Base Price -->
+                <div class="mb-3">
+                  <label for="basePrice" class="form-label fw-bold">Base Price:</label>
+                  <input
+                    type="number"
+                    id="basePrice"
+                    name="basePrice"
+                    class="form-control"
+                    placeholder="Enter base price"
+                    required
+                  />
+                  <div class="invalid-feedback">Please enter the base price.</div>
+                </div>
+
+                <!-- Quantity -->
+                <div class="mb-3">
+                  <label for="quantity" class="form-label fw-bold">Quantity:</label>
+                  <input
+                    type="number"
+                    id="quantity"
+                    name="quantity"
+                    class="form-control"
+                    placeholder="Enter quantity"
+                    required
+                  />
+                  <div class="invalid-feedback">Please enter the quantity.</div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="modal-footer">
+                  <button type="submit" class="btn btn-primary">Add Product</button>
+                  <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
         </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="d-flex justify-content-start mb-5">
+        <!-- Trigger the modal -->
+        <button
+          type="button"
+          class="btn btn-primary me-2"
+          data-bs-toggle="modal"
+          data-bs-target="#addProductModal"
+        >
+          Add Product
+        </button>
+        <a href="/company/submit-product" class="btn btn-secondary"
+          >Handover Product</a
+        >
+      </div>
     </div>
 
     <%- include('partials/footer') %>
 
     <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
-</body>
+  </body>
 </html>
