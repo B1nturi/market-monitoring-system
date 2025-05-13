@@ -199,7 +199,8 @@
           if (reason.includes("Only admin")) {
             alert("⛔️ Admin use only" );
           } else {
-            alert("❌ Failed to load metrics." + reason);
+            alert("❌ Failed to load metrics. Please try again later.");
+            console.error("Error loading metrics:", reason);
           }
           
         }
