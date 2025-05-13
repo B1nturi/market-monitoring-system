@@ -160,7 +160,7 @@ router.post('/submit-product', authenticateCompany, async (req, res) => {
 
 
         const blockchain = req.app.locals.blockchain;
-        await blockchain.addBlock(newProduct);
+        await blockchain.addBlock(newProductMetrics);
 
 
 
