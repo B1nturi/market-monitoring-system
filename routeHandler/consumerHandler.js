@@ -16,7 +16,10 @@ const User = mongoose.model('User', userSchema);
 // Add this route to fetch consumer's complaints
 router.get('/dashboard', authenticateConsumer, async (req, res) => {
     try {
-        const complaints = await Complaint.find({ consumerId: req.user.userId }).populate('companyId', 'companyDetails.name');
+        const complaints = await Complaint.find({
+            consumerId: req.user.userId,
+            status: { $in: ['Progressing', 'Responded'] }
+        }).populate('companyId', 'companyDetails.name');
 
         res.render('consumerDashboard', { complaints });
     } catch (err) {
@@ -62,6 +65,29 @@ router.post('/submit-complaint', authenticateConsumer, async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Error while submitting complaint' });
+    }
+});
+
+// chage the status of a complaint to "Resolved" (Consumer only)
+router.post('/resolve-complaint/:id', authenticateConsumer, async (req, res) => {
+    try {
+        const complaintId = req.params.id;
+
+        // Update the complaint's status to "Resolved"
+        const updatedComplaint = await Complaint.findByIdAndUpdate(
+            complaintId,
+            { status: 'Resolved' },
+            { new: true }
+        );
+
+        if (!updatedComplaint) {
+            return res.status(404).json({ error: 'Complaint not found' });
+        }
+
+        res.redirect('/consumer/dashboard'); // Redirect back to the consumer dashboard
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Error while resolving the complaint' });
     }
 });
 

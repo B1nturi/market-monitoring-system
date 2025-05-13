@@ -135,10 +135,10 @@
                     <div class="col-md-6 col-lg-4 mb-4">
                         <div class="card">
                             <!-- Badge on top-right -->
-                            <% if (complaint.status === 'Pending') { %>
-                                <span class="badge bg-warning text-dark">Pending</span>
+                            <% if (complaint.status === 'Responded') { %>
+                                <span class="badge bg-info text-dark">Pending</span>
                             <% } else if (complaint.status === 'Progressing') { %>
-                                <span class="badge bg-info text-dark">Progressing</span>
+                                <span class="badge bg-warning text-dark">Progressing</span>
                             <% } else if (complaint.status === 'Resolved') { %>
                                 <span class="badge bg-success">Resolved</span>
                             <% } else if (complaint.status === 'Rejected') { %>
@@ -151,6 +151,7 @@
                             <div class="card-body">
                                 <p><strong>Description:</strong> <%= complaint.description %></p>
                                 <p><strong>Company:</strong> <%= complaint.companyId.companyDetails.name %></p>
+
                             </div>
                         </div>
                     </div>

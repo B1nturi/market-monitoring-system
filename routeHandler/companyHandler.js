@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const productMetricsSchema = require('../schemas/productMetricsSchema');
 const userSchema = require('../schemas/userSchema');
 const product = require('../schemas/productSchema');
+const complaint = require('../schemas/complaintSchema');
 const Blockchain = require('../blockchain');
 const { authenticateCompany } = require('../middlewares/authMiddleware');
 const block = require('../schemas/block');
@@ -17,6 +18,7 @@ dotenv.config();
 const ProductMetrics = mongoose.model('ProductMetric', productMetricsSchema);
 const User = mongoose.model('User', userSchema);
 const Product = mongoose.model('Product', product);
+const Complaint = mongoose.model('Complaint', complaint);
 const Block = mongoose.model('Block', block);
 
 // Helper function to generate product ID
@@ -176,6 +178,52 @@ router.get('/view-submissions', authenticateCompany, async (req, res) => {
         res.status(200).json({ message: 'Submissions fetched successfully', data: submissions });
     } catch (err) {
         res.status(500).json({ error: 'Error while fetching submissions' });
+    }
+});
+
+// Get all consumer complaints (Company only)
+router.get('/complaints', authenticateCompany, async (req, res) => {
+  try {
+    const { status } = req.query; // Get the status filter from the query
+    const allowedStatuses = ['Progressing', 'Responded']; // Only allow these statuses
+    const filter = status && allowedStatuses.includes(status) ? { status } : { status: { $in: allowedStatuses } }; // Apply filter
+
+    const complaints = await Complaint.find(filter)
+      .populate('consumerId', 'name email') // Populate consumer details
+      .populate('companyId', 'companyDetails.name'); // Populate company details
+
+    res.status(200).render('company_showComplaints', {
+      message: 'Complaints fetched successfully',
+      data: complaints,
+      status // Pass the current status filter to the view
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error fetching complaints' });
+  }
+});
+
+// submit a complaint response (Company only)
+router.post('/respond/:id', authenticateCompany, async (req, res) => {
+    try {
+        const complaintId = req.params.id;
+        const { response, status } = req.body;
+
+        // Update the complaint with the company's response and status
+        const updatedComplaint = await Complaint.findByIdAndUpdate(
+            complaintId,
+            { companyResponse: response, status },
+            { new: true }
+        );
+
+        if (!updatedComplaint) {
+            return res.status(404).json({ error: 'Complaint not found' });
+        }
+
+        res.redirect('/company/complaints'); // Redirect back to the complaints page
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Error while responding to the complaint' });
     }
 });
 
