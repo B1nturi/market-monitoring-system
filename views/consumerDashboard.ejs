@@ -15,7 +15,6 @@
             height: 100%;
             font-family: 'Roboto', sans-serif;
             background: linear-gradient(135deg, #edf2f7, #e2e8f0);
-            /* Subtle gradient background */
         }
 
         body {
@@ -30,40 +29,43 @@
         .card {
             border: none;
             border-radius: 16px;
-            /* Smooth rounded corners */
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            /* Subtle shadow */
             background: linear-gradient(135deg, #ffffff, #f9fafb);
-            /* Subtle gradient for cards */
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
         }
 
         .card:hover {
             transform: translateY(-5px);
-            /* Lift effect on hover */
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
-            /* Stronger shadow on hover */
         }
 
         .card-header {
             font-size: 1.25rem;
             font-weight: 700;
             color: #2d3748;
-            /* Darker gray for card headers */
             background-color: transparent;
             border-bottom: none;
         }
 
-        .card-body p {
-            margin-bottom: 0.5rem;
-            font-size: 0.95rem;
-            color: #4a5568;
-            /* Neutral gray for text */
+        .card-body {
+            flex: 1;
+        }
+
+        .badge {
+            font-size: 0.9rem;
+            padding: 0.5em 0.75em;
+            border-radius: 12px;
+            position: absolute;
+            top: 15px;
+            right: 25px;
         }
 
         .btn-primary {
             background-color: #3182ce;
-            /* Blue button */
             border: none;
             border-radius: 10px;
             padding: 12px 20px;
@@ -72,36 +74,47 @@
             transition: all 0.3s ease;
             color: white;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            /* Subtle shadow */
         }
 
         .btn-primary:hover {
             background-color: #2b6cb0;
-            /* Darker blue on hover */
             transform: translateY(-2px);
-            /* Lift effect */
             box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
-            /* Enhanced shadow on hover */
         }
 
         .text-muted {
             font-size: 1rem;
             color: #718096;
-            /* Softer gray for muted text */
         }
 
         h1 {
             font-size: 2.5rem;
             font-weight: 700;
             color: #2d3748;
-            /* Dark gray for the main heading */
         }
 
         h2 {
             font-size: 1.8rem;
             font-weight: 600;
             color: #4a5568;
-            /* Neutral gray for section headings */
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            background: #f9fafb;
+            border-radius: 16px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            color: #4a5568;
+        }
+
+        .empty-state p {
+            font-size: 1rem;
+            color: #718096;
         }
     </style>
 </head>
@@ -109,43 +122,57 @@
 <body>
     <%- include('partials/header') %>
 
-        <div class="container mt-4">
-            <h1 class="text-center mb-5">Consumer Dashboard</h1>
+    <div class="container mt-4">
+        <h1 class="text-center mb-5">Consumer Dashboard</h1>
 
-            <div class="row">
-                <!-- Complaints Section -->
-                <div class="col-12">
-                    <h2 class="mb-4">My Complaints</h2>
-                    <% if (complaints.length > 0) { %>
-                    <div class="row">
-                        <% complaints.forEach(complaint => { %>
-                        <div class="col-md-6 col-lg-4 mb-4">
-                            <div class="card">
-                                <div class="card-header">
-                                    <%= complaint.title %>
-                                </div>
-                                <div class="card-body">
-                                    <p><strong>Description:</strong> <%= complaint.description %></p>
-                                    <p><strong>Company:</strong> <%= complaint.companyId.companyDetails.name %></p>
-                                    <p><strong>Status:</strong> <%= complaint.status %></p>
-                                </div>
+        <div class="row">
+            <!-- Complaints Section -->
+            <div class="col-12">
+                <h2 class="mb-4">My Complaints</h2>
+                <% if (complaints.length > 0) { %>
+                <div class="row">
+                    <% complaints.forEach(complaint => { %>
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card">
+                            <!-- Badge on top-right -->
+                            <% if (complaint.status === 'Pending') { %>
+                                <span class="badge bg-warning text-dark">Pending</span>
+                            <% } else if (complaint.status === 'Progressing') { %>
+                                <span class="badge bg-info text-dark">Progressing</span>
+                            <% } else if (complaint.status === 'Resolved') { %>
+                                <span class="badge bg-success">Resolved</span>
+                            <% } else if (complaint.status === 'Rejected') { %>
+                                <span class="badge bg-danger">Rejected</span>
+                            <% } %>
+
+                            <div class="card-header">
+                                <%= complaint.title %>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Description:</strong> <%= complaint.description %></p>
+                                <p><strong>Company:</strong> <%= complaint.companyId.companyDetails.name %></p>
                             </div>
                         </div>
-                        <% }) %>
                     </div>
-                    <% } else { %>
-                    <p class="text-muted text-center">No complaints available.</p>
-                    <% } %>
+                    <% }) %>
                 </div>
-            </div>
-
-            <div class="row justify-content-center mt-4">
-                <div class="col-12 text-center">
-                    <a href="/consumer/submit-complaint" class="btn btn-primary">Add Complaint</a>
-                    <a href="/consumer/productMetrics" class="btn btn-primary">View Your Product INFO</a>
+                <% } else { %>
+                <div class="empty-state">
+                    <h3>No Complaints Available</h3>
+                    <p>You haven't submitted any complaints yet. Click the button below to add one.</p>
+                    <a href="/consumer/submit-complaint" class="btn btn-primary mt-3">Add Complaint</a>
                 </div>
+                <% } %>
             </div>
         </div>
+
+        <div class="row justify-content-center mt-4">
+            <div class="col-12 text-center">
+                <a href="/consumer/submit-complaint" class="btn btn-primary me-2">Add Complaint</a>
+                <a href="/consumer/productMetrics" class="btn btn-primary">View Your Product INFO</a>
+            </div>
+        </div>
+    </div>
 
     <%- include('partials/footer') %>
 
