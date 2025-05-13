@@ -1,0 +1,99 @@
+<!-- 
+    This is off-chain Metrics page for the Market Monitoring System.
+    It displays product metrics based on the selected filters.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css" />
+    <style>
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        display: flex;
+        flex-direction: column;
+      }
+      main {
+        flex: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <%- include('partials/header') %>
+
+    <div class="container mt-5">
+      <h1 class="mb-4">Product Metrics</h1>
+
+      <form class="row g-3 mb-4" method="get" action="./productmetrics">
+        <div class="col-md-4">
+          <input
+            type="text"
+            name="productName"
+            value="<%= productName || '' %>"
+            class="form-control"
+            placeholder="Product Name"
+          />
+        </div>
+        <div class="col-md-4">
+          <input
+            type="text"
+            name="batchNumber"
+            value="<%= batchNumber || '' %>"
+            class="form-control"
+            placeholder="Batch Number"
+          />
+        </div>
+        <div class="col-md-4">
+          <button type="submit" class="btn btn-primary">Filter</button>
+        </div>
+      </form>
+
+      <% // only show results after user submits the form %> <% if (typeof
+      productName !== 'undefined' || typeof batchNumber !== 'undefined') { %> <%
+      if (metrics.length) { %>
+      <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+          <thead class="table-dark">
+            <tr>
+              <th>SL</th>
+              <th>Product ID</th>
+              <th>Name</th>
+              <th>Batch #</th>
+              <th>Price</th>
+              <th>Qty</th>
+              <th>From Company</th>
+              <th>To Company</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% metrics.forEach((m, idx) => { %>
+            <tr>
+              <td><%= idx + 1 %></td>
+              <td><%= m.productID %></td>
+              <td><%= m.productName %></td>
+              <td><%= m.batchNumber %></td>
+              <td><%= m.sellingPrice %></td>
+              <td><%= m.quantityBought %></td>
+              <td><%= m.fromCompany || 'N/A' %></td>
+              <td><%= m.toCompany || 'N/A' %></td>
+              <td><%= new Date(m.createdAt).toLocaleString() %></td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+      <% } else { %>
+      <p class="text-muted">No records found for your filter.</p>
+      <% } %> <% } %>
+    </div>
+
+    <%- include('partials/footer') %>
+  </body>
+</html>

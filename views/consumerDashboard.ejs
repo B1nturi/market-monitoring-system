@@ -1,61 +1,194 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Consumer Dashboard</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <!-- Bootstrap CSS -->
     <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        html, body {
+        html,
+        body {
             height: 100%;
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #edf2f7, #e2e8f0);
         }
+
         body {
             display: flex;
             flex-direction: column;
         }
-        main {
+
+        .container {
+            max-width: 1200px;
+        }
+
+        .card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, #ffffff, #f9fafb);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #2d3748;
+            background-color: transparent;
+            border-bottom: none;
+        }
+
+        .card-body {
             flex: 1;
+        }
+
+        .badge {
+            font-size: 0.9rem;
+            padding: 0.5em 0.75em;
+            border-radius: 12px;
+            position: absolute;
+            top: 15px;
+            right: 25px;
+        }
+
+        .btn-primary {
+            background-color: #3182ce;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary:hover {
+            background-color: #2b6cb0;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .text-muted {
+            font-size: 1rem;
+            color: #718096;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            background: #f9fafb;
+            border-radius: 16px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            color: #4a5568;
+        }
+
+        .empty-state p {
+            font-size: 1rem;
+            color: #718096;
         }
     </style>
 </head>
+
 <body>
     <%- include('partials/header') %>
 
     <div class="container mt-4">
-        <h1 class="text-center">Consumer Dashboard</h1>
+        <h1 class="text-center mb-5">Consumer Dashboard</h1>
 
-        <h2 class="mt-4">My Complaints</h2>
-        <% if (complaints.length > 0) { %>
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>Description</th>
-                        <th>Company</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
+        <div class="row">
+            <!-- Complaints Section -->
+            <div class="col-12">
+                <h2 class="mb-4">My Complaints</h2>
+                <% if (complaints.length > 0) { %>
+                <div class="row">
                     <% complaints.forEach(complaint => { %>
-                        <tr>
-                            <td><%= complaint.title %></td>
-                            <td><%= complaint.description %></td>
-                            <td><%= complaint.companyId.companyDetails.name %></td>
-                            <td><%= complaint.status %></td>
-                        </tr>
-                    <% }) %>
-                </tbody>
-            </table>
-        <% } else { %>
-            <p class="text-muted">No complaints available.</p>
-        <% } %>
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card">
+                            <!-- Badge on top-right -->
+                            <% if (complaint.status === 'Responded') { %>
+                                <span class="badge bg-info text-dark">Responded</span>
+                            <% } else if (complaint.status === 'Progressing') { %>
+                                <span class="badge bg-warning text-dark">Progressing</span>
+                            <% } else if (complaint.status === 'Resolved') { %>
+                                <span class="badge bg-success">Resolved</span>
+                            <% } else if (complaint.status === 'Rejected') { %>
+                                <span class="badge bg-danger">Rejected</span>
+                            <% } %>
 
-        <div class="mt-4">
-            <a href="/consumer/submit-complaint" class="btn btn-primary">Submit Complaint</a>
+                            <div class="card-header">
+                                <%= complaint.title %>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Description:</strong> <%= complaint.description %></p>
+                                <p><strong>Company:</strong> <%= complaint.companyId.companyDetails.name %></p>
+                                <% if (complaint.companyResponse && complaint.companyResponse.trim() !== '') { %>
+                                    <p><strong>Response:</strong> <%= complaint.companyResponse %></p>
+                                    <% } %>
+                                    <p><strong>Status:</strong> <%= complaint.status %></p>
+                                    <% if (complaint.status !== 'Resolved') { %>
+                                    <form action="/consumer/resolve-complaint/<%= complaint._id %>" method="POST">
+                                        <button type="submit" class="btn btn-primary btn-sm mt-2">Mark as Resolved</button>
+                                    </form>
+                                    <% } %>
+
+                            </div>
+                        </div>
+                    </div>
+                    <% }) %>
+                </div>
+                <% } else { %>
+                <div class="empty-state">
+                    <h3>No Complaints Available</h3>
+                    <p>You haven't submitted any complaints yet. Click the button below to add one.</p>
+                    <a href="/consumer/submit-complaint" class="btn btn-primary mt-3">Add Complaint</a>
+                </div>
+                <% } %>
+            </div>
+        </div>
+
+        <div class="row justify-content-center mt-4">
+            <div class="col-12 text-center">
+                <a href="/consumer/submit-complaint" class="btn btn-primary me-2">Add Complaint</a>
+                <a href="/consumer/productMetrics" class="btn btn-primary">View Your Product INFO</a>
+            </div>
         </div>
     </div>
 
     <%- include('partials/footer') %>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
 </body>
+
 </html>

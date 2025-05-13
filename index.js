@@ -1,56 +1,69 @@
-
-const express = require('express');
-const connectDB = require('./db');
-const dotenv = require('dotenv');
-const path = require('path');
-const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser'); // Add this line
-const userHandler = require('./routeHandler/userHandler');
-const companyHandler = require('./routeHandler/companyHandler');
+const express         = require('express');
+const connectDB       = require('./db');
+const dotenv          = require('dotenv');
+const path            = require('path');
+const cookieParser    = require('cookie-parser');
+const bodyParser      = require('body-parser');
+const Blockchain      = require('./blockchain');       // ← add
+const userHandler     = require('./routeHandler/userHandler');
+const companyHandler  = require('./routeHandler/companyHandler');
 const consumerHandler = require('./routeHandler/consumerHandler');
-const adminHandler = require('./routeHandler/adminHandler');
+const adminHandler    = require('./routeHandler/adminHandler');
 const blockchainHandler = require('./routeHandler/blockChainHandler');
-const productHandler = require('./routeHandler/productHandler');
+const productHandler  = require('./routeHandler/productHandler');
 
-// express app initialization
-const app = express();
 dotenv.config();
+const app = express();
+
+// middleware
 app.use(express.json());
 app.use(cookieParser());
-app.use(bodyParser.urlencoded({ extended: true })); // Add this line
+app.use(bodyParser.urlencoded({ extended: true }));
 
-// Set EJS as the view engine
+// view engine + static
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-
-// Serve Bootstrap CSS and JS from node_modules
 app.use('/bootstrap', express.static(path.join(__dirname, 'node_modules/bootstrap/dist')));
 
-// Connect to MongoDB
-connectDB();
+app.use(express.static(path.join(__dirname, 'public')));
 
-// app routes
-app.use('/user', userHandler);
-app.use('/company', companyHandler);
-app.use('/consumer', consumerHandler);
-app.use('/admin', adminHandler);
-app.use('/blockchain', blockchainHandler);
-app.use('/product', productHandler);
+async function start() {
+  // 1) connect to MongoDB
+  await connectDB();
+  console.log('MongoDB connected…');
 
-app.get('/', (req, res) => {
-  res.redirect('/user/login');
+  // 2) instantiate & init your blockchain once
+  const blockchain = new Blockchain();
+  await blockchain.init();
+  app.locals.blockchain = blockchain;
+  console.log('In-memory blockchain initialized');
+
+  // 3) wire up routes
+  app.use('/user',     userHandler);
+  app.use('/company',  companyHandler);
+  app.use('/consumer', consumerHandler);
+  app.use('/admin',    adminHandler);
+  app.use('/blockchain', blockchainHandler);
+  app.use('/product',  productHandler);
+
+  app.get('/', (req, res) => res.redirect('/user/login'));
+
+  // error handler
+  app.use((err, req, res, next) => {
+    console.error(err.stack);
+    if (res.headersSent) return next(err);
+    res.status(err.status || 500).render('errorHandler', {
+      errorCode:    err.status || 500,
+      errorMessage: err.message || 'Internal Server Error'
+    });
+  });
+
+  // 4) start listening
+  const port = process.env.PORT || 3000;
+  app.listen(port, () => console.log(`Server running at http://localhost:${port}`));
+}
+
+start().catch(err => {
+  console.error('Failed to start server:', err);
+  process.exit(1);
 });
-
-// default error handler
-app.use((err, req, res, next) => {
-  if (res.headersSent) {
-      return next(err);
-  }
-  res.status(500).json({ error: err });
-});
-
-// start the server
-app.listen(process.env.PORT, () => {
-  console.log(`Server running at http://localhost:${process.env.PORT}`);
-});
-
