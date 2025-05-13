@@ -191,9 +191,17 @@
           });
           countBadge.textContent = metrics.length;
           tblCont.style.display = metrics.length ? 'block' : 'none';
-        } catch (err) {
-          console.error(err);
-          alert('Failed to load metrics.');
+        } catch (error) {
+          console.error(error);
+          const reason =
+            error.reason || error.error?.message || error.message || "";
+
+          if (reason.includes("Only admin")) {
+            alert("⛔️ Admin use only" );
+          } else {
+            alert("❌ Failed to load metrics." + reason);
+          }
+          
         }
       });
 
@@ -232,6 +240,7 @@
           new bootstrap.Modal(document.getElementById('companyModal')).show();
         } catch (err) {
           console.error(err);
+          
           alert('Could not load company details.');
         }
       });
