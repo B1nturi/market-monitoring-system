@@ -185,7 +185,7 @@ router.get('/productmetrics', authenticateAdmin, async (req, res, next) => {
       {
         $lookup: {
           from: 'users',
-          localField: 'toCompanyId',
+          localField: 'toCompany',
           foreignField: '_id',
           as: 'toCompany'
         }
