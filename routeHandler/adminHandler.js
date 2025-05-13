@@ -10,6 +10,9 @@ const productMetricsSchema = require('../schemas/productMetricsSchema');
 const productSchema = require('../schemas/productSchema');
 const ProductMetrics = mongoose.model('ProductMetrics', productMetricsSchema);
 const Product = mongoose.model('Product', productSchema);
+const alertSchema = require('../schemas/alertSchema');
+const Alert = mongoose.model('Alert', alertSchema);
+
 require('dotenv').config();
 // Models
 const User = mongoose.model('User', userSchema);
@@ -171,8 +174,8 @@ router.get('/productmetrics', authenticateAdmin, async (req, res, next) => {
 
     // 2) optional filters
     const match = {};
-    if (productName)  match['product.productName'] = productName;
-    if (batchNumber)  match['product.batchNumber'] = batchNumber;
+    if (productName) match['product.productName'] = productName;
+    if (batchNumber) match['product.batchNumber'] = batchNumber;
     if (Object.keys(match).length) pipeline.push({ $match: match });
 
     // 3) join “from” company
@@ -204,15 +207,15 @@ router.get('/productmetrics', authenticateAdmin, async (req, res, next) => {
     // 5) shape the output
     pipeline.push({
       $project: {
-        _id:            0,
-        productID:      1,
-        productName:    '$product.productName',
-        batchNumber:    '$product.batchNumber',
-        sellingPrice:   1,
+        _id: 0,
+        productID: 1,
+        productName: '$product.productName',
+        batchNumber: '$product.batchNumber',
+        sellingPrice: 1,
         quantityBought: 1,
-        fromCompany:    '$fromCompany.companyDetails.name',
-        toCompany:      '$toCompany.companyDetails.name',
-        createdAt:      1
+        fromCompany: '$fromCompany.companyDetails.name',
+        toCompany: '$toCompany.companyDetails.name',
+        createdAt: 1
       }
     });
 
@@ -285,6 +288,101 @@ router.post('/updateComplaintStatus', async (req, res) => {
     res.status(500).send('Error updating complaint status');
   }
 });
+
+
+// Route: list all alerts with joined product & company info
+router.get('/alertlist', authenticateAdmin, async (req, res, next) => {
+  try {
+    const { status: filterStatus } = req.query;
+    const pipeline = [];
+
+    // 0) optional filter on alert.status
+    if (filterStatus) {
+      pipeline.push({ $match: { status: filterStatus } });
+    }
+
+    // 1) get the metrics doc
+    pipeline.push(
+      {
+        $lookup: {
+          from: 'productmetrics',
+          localField: 'metricsId',
+          foreignField: '_id',
+          as: 'metrics'
+        }
+      },
+      { $unwind: '$metrics' },
+
+      // 2) product info
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'metrics.productID',
+          foreignField: 'productID',
+          as: 'product'
+        }
+      },
+      { $unwind: '$product' },
+
+      // 3) from‐company
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'metrics.companyId',
+          foreignField: '_id',
+          as: 'fromCompany'
+        }
+      },
+      { $unwind: { path: '$fromCompany', preserveNullAndEmptyArrays: true } },
+
+      // 4) to‐company
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'metrics.toCompany',
+          foreignField: '_id',
+          as: 'toCompany'
+        }
+      },
+      { $unwind: { path: '$toCompany', preserveNullAndEmptyArrays: true } },
+
+      // 5) project fields including status
+      {
+        $project: {
+          _id:            1,
+          productName:    '$product.productName',
+          batchNumber:    '$product.batchNumber',
+          origin:         '$product.manufacturer',
+          quantityBought: '$metrics.quantityBought',
+          basePrice:      1,
+          sellingPrice:   1,
+          deviation:      1,
+          status:         1,
+          fromCompany:    '$fromCompany.companyDetails.name',
+          toCompany:      '$toCompany.companyDetails.name',
+          alertTime:      '$createdAt'
+        }
+      }
+    );
+
+    const alerts = await Alert.aggregate(pipeline);
+    res.render('alertList', { alerts, filterStatus });
+  } catch (err) {
+    next(err);
+  }
+});
+
+
+router.post('/alert/:id/resolve', authenticateAdmin, async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    await Alert.findByIdAndUpdate(id, { status: 'Resolved' });
+    res.redirect(`/admin/alertlist?status=${req.query.status||''}`);
+  } catch(err) {
+    next(err);
+  }
+});
+
 
 // Export the router
 module.exports = router;

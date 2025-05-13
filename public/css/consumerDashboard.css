@@ -1,0 +1,106 @@
+html,
+body {
+  height: 100%;
+  font-family: "Roboto", sans-serif;
+  background: linear-gradient(135deg, #edf2f7, #e2e8f0);
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  max-width: 1200px;
+}
+
+.card {
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #ffffff, #f9fafb);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #2d3748;
+  background-color: transparent;
+  border-bottom: none;
+}
+
+.card-body {
+  flex: 1;
+}
+
+.badge {
+  font-size: 0.9rem;
+  padding: 0.5em 0.75em;
+  border-radius: 12px;
+  position: absolute;
+  top: 15px;
+  right: 25px;
+}
+
+.btn-primary {
+  background-color: #3182ce;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 20px;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary:hover {
+  background-color: #2b6cb0;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+.text-muted {
+  font-size: 1rem;
+  color: #718096;
+}
+
+h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #2d3748;
+}
+
+h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #4a5568;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  background: #f9fafb;
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.empty-state h3 {
+  font-size: 1.5rem;
+  color: #4a5568;
+}
+
+.empty-state p {
+  font-size: 1rem;
+  color: #718096;
+}

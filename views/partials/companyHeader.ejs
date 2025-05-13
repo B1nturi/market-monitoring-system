@@ -6,7 +6,7 @@
   <link rel="stylesheet" href="/css/header.css" />
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container">
-      <a class="navbar-brand" href="/admin/dashboard"
+      <a class="navbar-brand" href="./dashboard"
         >Market Monitoring System</a
       >
       <button
@@ -29,7 +29,7 @@
           </li>
 
           <!-- Product dropdown -->
-          <li class="nav-item dropdown">
+          <!-- <li class="nav-item dropdown">
             <a
               class="nav-link dropdown-toggle"
               href="#"
@@ -39,20 +39,20 @@
               aria-expanded="false"
             >
               Product
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="companyDropdown">
-              <li>
+            </a> -->
+            <!-- <ul class="dropdown-menu" aria-labelledby="companyDropdown"> -->
+              <!-- <li>
                 <a class="dropdown-item" href="/product/add">
                   Add Product
                 </a>
-              </li>
+              </li> -->
               <li>
-                <a class="dropdown-item" href="/company/submit-product">
+                <a class="nav-link" href="/company/submit-product">
                   Handover Product
                 </a>
               </li>
-            </ul>
-          </li>
+            <!-- </ul>
+          </li> -->
 
           <li class="nav-item">
             <a class="nav-link" href="/company/productmetrics">Product Information</a>
@@ -61,7 +61,7 @@
 
           <!-- Logout -->
           <li class="nav-item">
-            <a class="nav-link" href="/user/logout">Logout</a>
+            <a class="nav-link text-danger" href="/user/logout">Logout</a>
           </li>
         </ul>
       </div>

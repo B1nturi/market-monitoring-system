@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+    <style>
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1;
+        }
+    </style>
+</head>
+
+<body>
+
+<%- include('partials/adminHeader') %>
+<div class="container mt-5">
+  <h1 class="mb-4">Price‐Deviation Alerts</h1>
+
+  <form class="row g-2 align-items-center mb-4" method="get" action="/admin/alertlist">
+    <div class="col-auto">
+      <label for="statusFilter" class="col-form-label">Show:</label>
+    </div>
+    <div class="col-auto">
+      <select id="statusFilter" name="status" class="form-select">
+        <option value="" <%= !filterStatus?'selected':'' %>>All</option>
+        <option value="Flagged" <%= filterStatus==='Flagged'?'selected':'' %>>Flagged</option>
+        <option value="Resolved" <%= filterStatus==='Resolved'?'selected':'' %>>Resolved</option>
+      </select>
+    </div>
+    <div class="col-auto">
+      <button type="submit" class="btn btn-primary">Apply</button>
+    </div>
+  </form>
+
+  <% if (alerts.length) { %>
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped align-middle">
+        <thead class="table-dark">
+          <tr>
+            <th>SL</th>
+            <th>Product Name</th>
+            <th>Batch #</th>
+            <th>Origin</th>
+            <th>Qty Sold</th>
+            <th>Base Price</th>
+            <th>Selling Price</th>
+            <th>Deviation</th>
+            <th>Status</th>
+            <th>From Company</th>
+            <th>To Company</th>
+            <th>Alert Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% alerts.forEach((a, idx) => { %>
+            <tr>
+              <td><%= idx+1 %></td>
+              <td><%= a.productName %></td>
+              <td><%= a.batchNumber %></td>
+              <td><%= a.origin || 'N/A' %></td>
+              <td><%= a.quantityBought %></td>
+              <td>$<%= a.basePrice.toFixed(2) %></td>
+              <td>$<%= a.sellingPrice.toFixed(2) %></td>
+              <td>$<%= a.deviation.toFixed(2) %> (<%= Math.round(a.deviation/a.basePrice*100) %>%)</td>
+              <td>
+                <select 
+                  class="form-select form-select-sm status-select" 
+                  data-id="<%= a._id %>">
+                  <option value="Flagged"  <%= a.status==='Flagged'?  'selected':'' %>>Flagged</option>
+                  <option value="Resolved" <%= a.status==='Resolved'? 'selected':'' %>>Resolved</option>
+                </select>
+              </td>
+              <td><%= a.fromCompany || 'N/A' %></td>
+              <td><%= a.toCompany || 'N/A' %></td>
+              <td><%= new Date(a.alertTime).toLocaleString() %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } else { %>
+    <p class="text-muted">No alerts to display.</p>
+  <% } %>
+</div>
+
+<%- include('partials/footer') %>
+<script>
+  document.querySelectorAll('.status-select').forEach(sel => {
+    sel.addEventListener('change', async () => {
+      const id = sel.dataset.id;
+      const status = sel.value;
+      await fetch(`/admin/alert/${id}/resolve?status=${encodeURIComponent(status)}`, {
+        method: 'POST'
+      });
+      // reload to show updated filter/status
+      window.location.reload();
+    });
+  });
+</script>
+
+</body>
+
+</html>
