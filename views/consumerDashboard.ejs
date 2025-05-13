@@ -127,7 +127,15 @@
                                 <div class="card-body">
                                     <p><strong>Description:</strong> <%= complaint.description %></p>
                                     <p><strong>Company:</strong> <%= complaint.companyId.companyDetails.name %></p>
+                                    <% if (complaint.companyResponse && complaint.companyResponse.trim() !== '') { %>
+                                    <p><strong>Response:</strong> <%= complaint.companyResponse %></p>
+                                    <% } %>
                                     <p><strong>Status:</strong> <%= complaint.status %></p>
+                                    <% if (complaint.status !== 'Resolved') { %>
+                                    <form action="/consumer/resolve-complaint/<%= complaint._id %>" method="POST">
+                                        <button type="submit" class="btn btn-primary btn-sm mt-2">Mark as Resolved</button>
+                                    </form>
+                                    <% } %>
                                 </div>
                             </div>
                         </div>
