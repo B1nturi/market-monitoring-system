@@ -97,7 +97,10 @@
                             <% }) %>
                     </tbody>
                 </table>
-                <a href="/admin/addcompany" class="btn btn-primary">Add Company</a>
+                <div class="mt-3">
+                    <a href="/admin/addcompany" class="btn btn-primary me-2">Add Company</a>
+                    <a href="/admin/revokeCompany" class="btn btn-danger">Revoke Company</a>
+                </div>
             </div>
             <% } else { %>
                 <p class="text-muted">No companies available.</p>
@@ -166,7 +169,7 @@
                                 <h2 class="mt-5 mb-3">Blockchain Information</h2>
                                 <div class="d-flex flex-wrap gap-2">
                                     <a href="/admin/showblockinfo" class="btn btn-primary mb-3">View Blockchain Info</a>
-                                    <a href="/admin/revokeCompany" class="btn btn-primary mb-3">Revoke Company</a>
+                                    <!-- <a href="/admin/revokeCompany" class="btn btn-primary mb-3">Revoke Company</a> -->
                                 </div>
     </div>
     <%- include('partials/footer') %>
