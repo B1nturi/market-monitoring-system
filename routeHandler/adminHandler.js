@@ -249,7 +249,7 @@ router.get('/isRegistered', authenticateAdmin, async (req, res) => {
     });
   }
   catch (error) {
-    next(err)
+    next(error)
   }
 });
 
