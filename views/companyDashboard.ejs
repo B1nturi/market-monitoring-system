@@ -8,6 +8,8 @@
     <style>
         html, body {
             height: 100%;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f3f4f6; /* Light gray background for a clean look */
         }
         body {
             display: flex;
@@ -16,35 +18,104 @@
         main {
             flex: 1;
         }
+        .card {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff; /* White background for cards */
+        }
+        .card-header {
+            background-color: #1e293b; /* Dark navy for headers */
+            color: white;
+            padding: 1rem 1.5rem;
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+        .card-body {
+            padding: 1.5rem;
+        }
+        .table th, .table td {
+            vertical-align: middle;
+            text-align: center;
+        }
+        .btn {
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+        }
+        .btn-primary {
+            background-color: #2563eb; /* Vibrant blue for primary buttons */
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #1d4ed8; /* Darker blue on hover */
+        }
+        .btn-danger {
+            background-color: #dc2626; /* Bright red for danger buttons */
+            border: none;
+        }
+        .btn-danger:hover {
+            background-color: #b91c1c; /* Darker red on hover */
+        }
+        .btn-secondary {
+            background-color: #64748b; /* Neutral gray for secondary buttons */
+            border: none;
+        }
+        .btn-secondary:hover {
+            background-color: #475569; /* Darker gray on hover */
+        }
+        .container {
+            max-width: 1200px;
+        }
+        h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #1e293b; /* Dark navy for headings */
+        }
+        a {
+            text-decoration: none;
+            color: #2563eb; /* Blue for links */
+        }
+        a:hover {
+            color: #1d4ed8; /* Darker blue on hover */
+        }
+        .table-dark {
+            background-color: #1e293b; /* Dark navy for table headers */
+            color: white;
+        }
+        .text-muted {
+            color: #6b7280 !important; /* Muted gray for secondary text */
+        }
     </style>
 </head>
 <body>
+
     <%- include('partials/header') %>
 
     <div class="container mt-5">
-        <h1 class="text-center mb-4">Company Dashboard</h1>
+        <h1 class="text-center mb-5">Company Dashboard</h1>
 
         <!-- Company Details Section -->
         <div class="card mb-4">
             <div class="card-header">
-                <h2>Company Details</h2>
+                Company Details
             </div>
             <div class="card-body">
                 <p><strong>Name:</strong> <%= company.companyDetails.name %></p>
                 <p><strong>Address:</strong> <%= company.companyDetails.address %></p>
-                <p><strong>Website:</strong> <%= company.companyDetails.website %></p>
+                <p><strong>Website:</strong> <a href="<%= company.companyDetails.website %>" target="_blank" class="text-primary"><%= company.companyDetails.website %></a></p>
             </div>
         </div>
 
         <!-- Products Section -->
         <div class="card mb-4">
             <div class="card-header">
-                <h2>Products</h2>
+                Products
             </div>
             <div class="card-body">
                 <% if (products.length > 0) { %>
                     <div class="table-responsive">
-                        <table class="table table-bordered table-striped">
+                        <table class="table table-bordered table-hover">
                             <thead class="table-dark">
                                 <tr>
                                     <th>Product Name</th>
@@ -59,7 +130,7 @@
                                     <tr>
                                         <td><%= product.productName %></td>
                                         <td><%= product.manufacturer %></td>
-                                        <td><%= product.basePrice %></td>
+                                        <td>$<%= product.basePrice.toFixed(2) %></td>
                                         <td><%= product.quantity %></td>
                                         <!-- <td>
                                             <button class="btn btn-primary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#editModal<%= product.id %>">Edit</button>
@@ -107,12 +178,14 @@
         </div>
 
         <!-- Action Buttons -->
-        <div class="d-flex justify-content-start">
-            <a href="/product/add" class="btn btn-secondary me-2">Add Product</a>
+        <div class="d-flex justify-content-start mb-5">
+            <a href="/product/add" class="btn btn-primary me-2">Add Product</a>
             <a href="/company/submit-product" class="btn btn-secondary">Handover Product</a>
         </div>
     </div>
 
     <%- include('partials/footer') %>
+
+    <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
