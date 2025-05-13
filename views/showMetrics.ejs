@@ -2,7 +2,6 @@
     shows the on-chain product metrics
 -->
 
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -26,55 +25,8 @@
     </style>
   </head>
   <body>
-    <header>
-      <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container">
-          <a class="navbar-brand" href="/admin/dashboard"
-            >Market Monitoring System</a
-          >
-          <button
-            class="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarNav"
-            aria-controls="navbarNav"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-              <li class="nav-item">
-                <a class="nav-link" href="/admin/dashboard">Dashboard</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="/admin/addcompany">Add Company</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="/admin/revokeCompany"
-                  >Revoke Company</a
-                >
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="/admin/productmetrics"
-                  >Product Metrics</a
-                >
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="/admin/showmetrics"
-                  >On-Chain Product Metrics</a
-                >
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="/user/logout">Logout</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </nav>
-    </header>
-
+    <%- include('partials/adminHeader') %>
+    <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
     <main class="container mt-5">
       <h1 class="mb-4">
         On-Chain Product Metrics
@@ -239,9 +191,18 @@
           });
           countBadge.textContent = metrics.length;
           tblCont.style.display = metrics.length ? 'block' : 'none';
-        } catch (err) {
-          console.error(err);
-          alert('Failed to load metrics.');
+        } catch (error) {
+          console.error(error);
+          const reason =
+            error.reason || error.error?.message || error.message || "";
+
+          if (reason.includes("Only admin")) {
+            alert("⛔️ Admin use only" );
+          } else {
+            alert("❌ Failed to load metrics. Please try again later.");
+            console.error("Error loading metrics:", reason);
+          }
+          
         }
       });
 
@@ -280,6 +241,7 @@
           new bootstrap.Modal(document.getElementById('companyModal')).show();
         } catch (err) {
           console.error(err);
+          
           alert('Could not load company details.');
         }
       });

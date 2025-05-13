@@ -1,0 +1,101 @@
+<header>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="/css/header.css" />
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+      <a class="navbar-brand" href="/admin/dashboard"
+        >Market Monitoring System</a
+      >
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <!-- Dashboard -->
+          <li class="nav-item">
+            <a class="nav-link" href="/admin/dashboard">Dashboard</a>
+          </li>
+
+          <!-- Company dropdown -->
+          <li class="nav-item dropdown">
+            <a
+              class="nav-link dropdown-toggle"
+              href="#"
+              id="companyDropdown"
+              role="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              Company
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="companyDropdown">
+              <li>
+                <a class="dropdown-item" href="/admin/addcompany">
+                  Add Company
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="/admin/revokeCompany">
+                  Revoke Company
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="/admin/isRegistered">
+                  Check Registration
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <!-- Product Metrics -->
+          <li class="nav-item dropdown">
+            <a
+              class="nav-link dropdown-toggle"
+              href="#"
+              id="productDropdown"
+              role="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              Product Information
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="productDropdown">
+              <li>
+                <a class="dropdown-item" href="/admin/productMetrics">
+                  Off-Chain Product Metrics
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="/admin/showMetrics">
+                  On-Chain Product Metrics
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="/admin/showblockinfo">
+                  Off-Chain Blockchain Information
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <!-- Logout -->
+          <li class="nav-item">
+            <a class="nav-link" href="/user/logout">Logout</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>

@@ -26,7 +26,7 @@ router.get('/dashboard', authenticateAdmin, async (req, res) => {
     const companies = await User.find({ role: 'company' }).select('-password'); // Exclude passwords
 
     // Fetch all complaints
-    const complaints = await Complaint.find().populate('consumerId', 'name email').populate('companyId', 'companyDetails.name');
+    const complaints = await Complaint.find().populate('companyId', 'companyDetails.name');
 
     // Fetch data from Block collection
     // const blocks = await Block.find().sort({ index: -1 }).limit(10); // Example: Fetch latest 10 blocks
@@ -131,12 +131,21 @@ router.get('/company/:id/json', authenticateAdmin, async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+
 // Get all consumer complaints (Admin only)
 router.get('/complaints', authenticateAdmin, async (req, res) => {
   try {
-    const complaints = await Complaint.find().populate('consumerId', 'name email').populate('companyId', 'companyDetails.name');
+    const { status } = req.query; // Get the status filter from the query
+    const filter = status ? { status } : {}; // Apply filter only if status is provided
+    const complaints = await Complaint.find(filter)
+      .populate('consumerId', 'name email') // Populate consumer details
+      .populate('companyId', 'companyDetails.name'); // Populate company details
 
-    res.status(200).json({ message: 'Complaints fetched successfully', data: complaints });
+    res.status(200).render('showComplaints', {
+      message: 'Complaints fetched successfully',
+      data: complaints,
+      status // Pass the current status filter to the view
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Error fetching complaints' });
@@ -144,12 +153,11 @@ router.get('/complaints', authenticateAdmin, async (req, res) => {
 });
 
 
-
-router.get('/productmetrics', authenticateAdmin, async (req, res) => {
+router.get('/productmetrics', authenticateAdmin, async (req, res, next) => {
   try {
     const { productName, batchNumber } = req.query;
     const pipeline = [
-      // join in product details
+      // 1) join in product details
       {
         $lookup: {
           from: 'products',
@@ -161,43 +169,57 @@ router.get('/productmetrics', authenticateAdmin, async (req, res) => {
       { $unwind: '$product' }
     ];
 
-    // optional filters
+    // 2) optional filters
     const match = {};
-    if (productName) match['product.productName'] = productName;
-    if (batchNumber) match['product.batchNumber'] = batchNumber;
+    if (productName)  match['product.productName'] = productName;
+    if (batchNumber)  match['product.batchNumber'] = batchNumber;
     if (Object.keys(match).length) pipeline.push({ $match: match });
 
-    // join in company names
+    // 3) join “from” company
     pipeline.push(
       {
         $lookup: {
           from: 'users',
           localField: 'companyId',
           foreignField: '_id',
-          as: 'company'
+          as: 'fromCompany'
         }
       },
-      { $unwind: '$company' },
-      // shape the output
-      {
-        $project: {
-          _id: 0,
-          productID: 1,
-          productName: '$product.productName',
-          batchNumber: '$product.batchNumber',
-          sellingPrice: 1,
-          quantityBought: 1,
-          companyName: '$company.companyDetails.name',
-          createdAt: 1
-        }
-      }
+      { $unwind: { path: '$fromCompany', preserveNullAndEmptyArrays: true } }
     );
+
+    // 4) join “to” company
+    pipeline.push(
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'toCompany',
+          foreignField: '_id',
+          as: 'toCompany'
+        }
+      },
+      { $unwind: { path: '$toCompany', preserveNullAndEmptyArrays: true } }
+    );
+
+    // 5) shape the output
+    pipeline.push({
+      $project: {
+        _id:            0,
+        productID:      1,
+        productName:    '$product.productName',
+        batchNumber:    '$product.batchNumber',
+        sellingPrice:   1,
+        quantityBought: 1,
+        fromCompany:    '$fromCompany.companyDetails.name',
+        toCompany:      '$toCompany.companyDetails.name',
+        createdAt:      1
+      }
+    });
 
     const metrics = await ProductMetrics.aggregate(pipeline);
     res.render('productMetrics', { metrics, productName, batchNumber });
   } catch (err) {
-    console.error(err);
-    res.status(500).send('Server Error');
+    next(err);
   }
 });
 
@@ -257,7 +279,7 @@ router.post('/updateComplaintStatus', async (req, res) => {
   const { complaintId, status } = req.body;
   try {
     await Complaint.findByIdAndUpdate(complaintId, { status });
-    res.redirect('/admin/dashboard'); // Redirect back to the dashboard
+    res.redirect('/admin/complaints'); // Redirect back to the dashboard
   } catch (error) {
     console.error(error);
     res.status(500).send('Error updating complaint status');
