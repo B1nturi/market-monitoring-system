@@ -1,0 +1,290 @@
+<!-- 
+    shows the on-chain product metrics
+-->
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>On-Chain Product Metrics</title>
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/ethers/dist/ethers.umd.min.js"></script>
+    <style>
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        display: flex;
+        flex-direction: column;
+      }
+      main {
+        flex: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+          <a class="navbar-brand" href="/admin/dashboard"
+            >Market Monitoring System</a
+          >
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarNav"
+            aria-controls="navbarNav"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+              <li class="nav-item">
+                <a class="nav-link" href="/admin/dashboard">Dashboard</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/admin/addcompany">Add Company</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/admin/revokeCompany"
+                  >Revoke Company</a
+                >
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/admin/productmetrics"
+                  >Product Metrics</a
+                >
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/admin/showmetrics"
+                  >On-Chain Product Metrics</a
+                >
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/user/logout">Logout</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container mt-5">
+      <h1 class="mb-4">
+        On-Chain Product Metrics
+        <span class="badge bg-secondary" id="recordCount">0</span>
+      </h1>
+      <div class="mb-3">
+        <button id="connectBtn" class="btn btn-success">Connect Wallet</button>
+        <button id="loadBtn" class="btn btn-primary" disabled>
+          Load Metrics
+        </button>
+      </div>
+      <p>Current Account: <strong id="acct">Not connected</strong></p>
+
+      <div
+        class="table-responsive mt-4"
+        id="tableContainer"
+        style="display: none"
+      >
+        <table class="table table-bordered">
+          <thead class="table-dark">
+            <tr>
+              <th>ID</th>
+              <th>Company ID</th>
+              <th>From</th>
+              <th>Product ID</th>
+              <th>Origin</th>
+              <th>To Address</th>
+              <th>To Company ID</th>
+              <th>Price</th>
+              <th>Qty</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody id="metricsBody"></tbody>
+        </table>
+      </div>
+    </main>
+
+    <!-- Company Details Modal -->
+    <div
+      class="modal fade"
+      id="companyModal"
+      tabindex="-1"
+      aria-labelledby="companyModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="companyModalLabel">Company Details</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <ul class="list-group">
+              <li class="list-group-item">
+                <strong>Username:</strong> <span id="modalUsername"></span>
+              </li>
+              <li class="list-group-item">
+                <strong>Status:</strong> <span id="modalStatus"></span>
+              </li>
+              <!-- <li class="list-group-item"><strong>Phone:</strong> <span id="modalPhone"></span></li> -->
+              <li class="list-group-item">
+                <strong>Company Name:</strong> <span id="modalName"></span>
+              </li>
+              <li class="list-group-item">
+                <strong>Company Registration:</strong>
+                <span id="modalRegNum"></span>
+              </li>
+              <li class="list-group-item">
+                <strong>Company Address:</strong>
+                <span id="modalAddress"></span>
+              </li>
+              <li class="list-group-item">
+                <strong>Company Website:</strong>
+                <a
+                  href="#"
+                  id="modalWebsiteLink"
+                  target="_blank"
+                  class="link-primary"
+                ></a>
+              </li>
+              <li class="list-group-item">
+                <strong>Company Wallet:</strong>
+                <span id="modalWallet" style="font-family: monospace"></span>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-secondary ms-2"
+                  id="copyWalletBtn"
+                  title="Copy address"
+                >
+                  📋
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script>
+      const contractAddress = '<%= contractAddress %>';
+      const contractABI     = <%- JSON.stringify(contractABI) %>;
+
+      if (!contractAddress.startsWith('0x')) {
+        alert('⚠️ CONTRACT_ADDRESS missing in .env');
+        throw new Error('Missing CONTRACT_ADDRESS');
+      }
+
+      let provider, signer, contract;
+      const connectBtn = document.getElementById('connectBtn');
+      const loadBtn    = document.getElementById('loadBtn');
+      const acctSpan   = document.getElementById('acct');
+      const tblCont    = document.getElementById('tableContainer');
+      const body       = document.getElementById('metricsBody');
+      const countBadge = document.getElementById('recordCount');
+
+      connectBtn.addEventListener('click', async () => {
+        if (!window.ethereum) return alert('Please install MetaMask');
+        provider = new ethers.BrowserProvider(window.ethereum);
+        await provider.send('eth_requestAccounts', []);
+        signer = await provider.getSigner();
+        acctSpan.textContent = await signer.getAddress();
+        contract = new ethers.Contract(contractAddress, contractABI, signer);
+        loadBtn.disabled = false;
+      });
+
+      loadBtn.addEventListener('click', async () => {
+        try {
+          const rawMetrics = await contract.getAllMetrics();
+          // clone into a real array
+          const metrics    = [...rawMetrics];
+
+          // now you can sort in‐place
+          metrics.sort((a, b) => Number(b.timestamp) - Number(a.timestamp));
+
+          body.innerHTML = '';
+          metrics.forEach(m => {
+            const entryId      = m.entryId.toString();
+            const tsMs         = Number(m.timestamp) * 1000;
+            const dt           = new Date(tsMs).toLocaleString();
+            const sellingPrice = Number(m.sellingPrice);
+            const quantity     = Number(m.quantityBought);
+            const row = `<tr>
+              <td>${entryId}</td>
+              <td><a href="#" class="company-link link-primary" data-id="${m.companyId}">${m.companyId}</a></td>
+              <td>${m.fromAddress}</td>
+              <td>${m.productID}</td>
+              <td>${m.productOrigin}</td>
+              <td>${m.toCompanyAddress}</td>
+              <td><a href="#" class="company-link link-primary" data-id="${m.toCompanyId}">${m.toCompanyId}</a></td>
+              <td>${sellingPrice}</td>
+              <td>${quantity}</td>
+              <td>${dt}</td>
+            </tr>`;
+            body.insertAdjacentHTML('beforeend', row);
+          });
+          countBadge.textContent = metrics.length;
+          tblCont.style.display = metrics.length ? 'block' : 'none';
+        } catch (err) {
+          console.error(err);
+          alert('Failed to load metrics.');
+        }
+      });
+
+      document.addEventListener('click', async e => {
+        if (!e.target.classList.contains('company-link')) return;
+        e.preventDefault();
+        const id = e.target.dataset.id;
+        try {
+          const res = await fetch(`/admin/company/${id}/json`);
+          const u   = await res.json();
+          document.getElementById('modalUsername').textContent = u.username;
+          document.getElementById('modalStatus').textContent   = u.status;
+          // document.getElementById('modalPhone').textContent    = u.phone || '—';
+          document.getElementById('modalName').textContent     = u.companyDetails.name;
+          document.getElementById('modalRegNum').textContent   = u.companyDetails.registrationNumber;
+          document.getElementById('modalAddress').textContent  = u.companyDetails.address || '—';
+          const website = u.companyDetails.website || '';
+          const linkEl  = document.getElementById('modalWebsiteLink');
+          if (website) {
+            linkEl.href = website.match(/^https?:\/\//) ? website : 'https://' + website;
+            linkEl.textContent = website;
+          } else {
+            linkEl.removeAttribute('href');
+            linkEl.textContent = '—';
+          }
+          const wallet = u.companyDetails.walletaddress || '';
+          document.getElementById('modalWallet').textContent = wallet;
+          const copyBtn = document.getElementById('copyWalletBtn');
+          copyBtn.onclick = () => {
+            if (!wallet) return;
+            navigator.clipboard.writeText(wallet).then(() => {
+              copyBtn.textContent = '✅';
+              setTimeout(() => copyBtn.textContent = '📋', 1000);
+            });
+          };
+          new bootstrap.Modal(document.getElementById('companyModal')).show();
+        } catch (err) {
+          console.error(err);
+          alert('Could not load company details.');
+        }
+      });
+    </script>
+
+    <%- include('partials/footer') %>
+  </body>
+</html>

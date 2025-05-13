@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Check Company Registration</title>
+  <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/ethers/dist/ethers.umd.min.js"></script>
+  <style>
+    html, body { height:100%; }
+    body { display:flex; flex-direction:column; }
+    main { flex:1; }
+  </style>
+</head>
+<body>
+  <%- include('partials/header') %>
+
+  <div class="container mt-5">
+    <button id="connectBtn" class="btn btn-success">🔌 Connect Wallet</button>
+    <button id="disconnectBtn" class="btn btn-danger" disabled>❌ Disconnect</button>
+    <p class="mt-2">Connected Address: <span id="wallet-address">Not connected</span></p>
+
+    <h1 class="mb-4">Is Company Registered?</h1>
+    <form>
+      <div class="mb-3">
+        <label for="companySelect" class="form-label">Select Company</label>
+        <select id="companySelect" class="form-select">
+          <% toCompanies.forEach(c => { %>
+            <option value="<%= c.userId %>" data-wallet="<%= c.walletaddress %>">
+              <%= c.name %>
+            </option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label for="walletAddress" class="form-label">Wallet Address</label>
+        <input type="text" id="walletAddress" class="form-control" readonly/>
+      </div>
+      <button id="checkBtn" type="button" class="btn btn-primary">Check</button>
+    </form>
+
+    <!-- status modal trigger area (hidden) -->
+    <p id="statusResult" class="mt-3 fs-5 d-none"></p>
+  </div>
+
+  <!-- Bootstrap Status Modal -->
+  <div class="modal fade" id="statusModal" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="statusModalLabel">Registration Status</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="statusModalBody"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS bundle -->
+  <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // elements
+    const companySelect  = document.getElementById("companySelect");
+    const walletInput    = document.getElementById("walletAddress");
+    const connectBtn     = document.getElementById("connectBtn");
+    const disconnectBtn  = document.getElementById("disconnectBtn");
+    const walletDisplay  = document.getElementById("wallet-address");
+    const checkBtn       = document.getElementById("checkBtn");
+    let currentAccount   = null;
+
+    // update wallet input when company changes
+    function updateWallet() {
+      walletInput.value = companySelect.selectedOptions[0].dataset.wallet || "";
+    }
+    companySelect.addEventListener("change", updateWallet);
+    updateWallet();
+
+    // wallet connect/disconnect
+    async function connectWallet() {
+      if (!window.ethereum) {
+        alert("MetaMask not found. Please install it.");
+        return;
+      }
+      try {
+        const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+        currentAccount = accounts[0];
+        walletDisplay.textContent = currentAccount;
+        connectBtn.disabled    = true;
+        disconnectBtn.disabled = false;
+      } catch (err) {
+        console.error("Connection failed:", err);
+      }
+    }
+    function disconnectWallet() {
+      currentAccount = null;
+      walletDisplay.textContent = "Not connected";
+      connectBtn.disabled    = false;
+      disconnectBtn.disabled = true;
+    }
+    connectBtn.addEventListener("click", connectWallet);
+    disconnectBtn.addEventListener("click", disconnectWallet);
+
+    // injected from server
+    const contractAddress = "<%= contractAddress %>";
+    const contractABI     = <%- JSON.stringify(abi) %>;
+
+    // client-side sanity checks
+    if (!contractAddress.startsWith('0x')) {
+      alert('⚠️ CONTRACT_ADDRESS missing or invalid');
+      throw new Error('Missing CONTRACT_ADDRESS');
+    }
+    if (!Array.isArray(contractABI) || contractABI.length === 0) {
+      alert('⚠️ CONTRACT_ABI missing or invalid');
+      throw new Error('Missing CONTRACT_ABI');
+    }
+
+    // check registration on chain
+    async function checkRegistration() {
+      const addr = walletInput.value.trim();
+      if (!addr || !ethers.isAddress(addr)) {
+        alert("Enter a valid Ethereum address.");
+        return;
+      }
+      if (!currentAccount) {
+        alert("Connect your wallet first.");
+        return;
+      }
+      try {
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer   = await provider.getSigner();
+        const contract = new ethers.Contract(contractAddress, contractABI, signer);
+        const registered = await contract.isCompany(addr);
+        const msg = registered
+          ? `✅ ${addr} is registered.`
+          : `❌ ${addr} is NOT registered.`;
+
+        // show pop-up
+        document.getElementById("statusModalBody").textContent = msg;
+        new bootstrap.Modal(document.getElementById("statusModal")).show();
+      } catch (err) {
+        console.error("Check failed:", err);
+        alert("Error checking registration.");
+      }
+    }
+    checkBtn.addEventListener("click", checkRegistration);
+  </script>
+
+  <%- include('partials/footer') %>
+</body>
+</html>
