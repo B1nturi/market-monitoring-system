@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complaints</title>
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+</head>
+
+<body>
+    <%- include('partials/adminHeader') %>
+
+        <div class="container mt-5">
+            <h1 class="text-center mb-4">Consumer Complaints</h1>
+
+            <!-- Filter Complaints by Status -->
+            <div class="mb-3">
+                <form action="/company/complaints" method="GET" class="d-flex align-items-center">
+                    <label for="statusFilter" class="me-2">Filter by Status:</label>
+                    <select name="status" id="statusFilter" class="form-select me-2" onchange="this.form.submit()">
+                        <option value="" <%=!status ? 'selected' : '' %>>All</option>
+                        <option value="Progressing" <%=status==='Progressing' ? 'selected' : '' %>>Progressing</option>
+                        <option value="Responded" <%=status==='Responded' ? 'selected' : '' %>>Responded</option>
+                    </select>
+                </form>
+            </div>
+
+            <% if (data.length> 0) { %>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Consumer Name</th>
+                                <th>Consumer Email</th>
+                                <th>Company Name</th>
+                                <th>Title</th>
+                                <th>Description</th>
+                                <th>Company Response</th>
+                                <th>Status</th>
+                                <th>Created At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% data.forEach(complaint=> { %>
+                                <tr>
+                                    <td>
+                                        <%= complaint.consumerId && complaint.consumerId.name ?
+                                            complaint.consumerId.name : 'N/A' %>
+                                    </td>
+                                    <td>
+                                        <%= complaint.consumerId && complaint.consumerId.email ?
+                                            complaint.consumerId.email : 'N/A' %>
+                                    </td>
+                                    <td>
+                                        <%= complaint.companyId && complaint.companyId.companyDetails &&
+                                            complaint.companyId.companyDetails.name ?
+                                            complaint.companyId.companyDetails.name : 'N/A' %>
+                                    </td>
+                                    <td>
+                                        <%= complaint.title %>
+                                    </td>
+                                    <td>
+                                        <%= complaint.description %>
+                                    </td>
+                                    <td>
+                                        <% if (complaint.companyResponse) { %>
+                                            <%= complaint.companyResponse %>
+                                        <% } else { %>
+                                            <form action="/company/respond/<%= complaint._id %>" method="POST">
+                                                <input type="text" name="response" class="form-control mb-2" placeholder="Write a response">
+                                                <input type="hidden" name="status" value="Responded">
+                                                <button type="submit" class="btn btn-primary btn-sm">Respond</button>
+                                            </form>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <%= complaint.status %>
+                                    </td>
+                                    <td>
+                                        <%= new Date(complaint.createdAt).toLocaleString() %>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+                <% } else { %>
+                    <p class="text-muted text-center">No complaints available.</p>
+                    <% } %>
+        </div>
+
+        <%- include('partials/footer') %>
+</body>
+
+</html>
