@@ -19,10 +19,14 @@ const complaintSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    companyResponse: {
+        type: String,
+        required: true
+    },
     status: {
         type: String,
-        enum: ['Pending', 'Progressing', 'Resolved', 'Rejected'],
-        default: 'Pending'
+        enum: ['Progressing', 'Responded', 'Resolved', 'Rejected'],
+        default: 'Progressing'
     },
     createdAt: {
         type: Date,
