@@ -505,7 +505,16 @@
           alert(`✅ Company ${companyAddress} registered on blockchain.`);
         } catch (error) {
           console.error("Registration failed:", error);
-          alert("❌ Registration failed. Check the console for details.");
+
+          // grab the revert reason
+          const reason =
+            error.reason || error.error?.message || error.message || "";
+
+          if (reason.includes("Only admin")) {
+            alert("⛔️ Admin use only");
+          } else {
+            alert("❌ Registration failed. Check console for details.");
+          }
         }
       }
 
