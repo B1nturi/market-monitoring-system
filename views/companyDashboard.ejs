@@ -16,21 +16,35 @@
 
       <!-- Company Details Section -->
       <div class="card mb-4">
-        <div class="card-header">Company Details</div>
-        <div class="card-body">
-          <p><strong>Name:</strong> <%= company.companyDetails.name %></p>
-          <p><strong>Address:</strong> <%= company.companyDetails.address %></p>
-          <p>
-            <strong>Website:</strong>
-            <a
-              href="<%= company.companyDetails.website %>"
-              target="_blank"
-              class="text-primary"
-              ><%= company.companyDetails.website %></a
-            >
-          </p>
+      <div class="card-header">Company Details</div>
+      <div class="card-body">
+        <div class="detail-row row">
+          <div class="col-sm-3 detail-label">Name:</div>
+          <div class="col-sm-9 detail-value"><%= company.companyDetails.name %></div>
+        </div>
+        <div class="detail-row row">
+          <div class="col-sm-3 detail-label">Address:</div>
+          <div class="col-sm-9 detail-value"><%= company.companyDetails.address %></div>
+        </div>
+        <div class="detail-row row">
+          <div class="col-sm-3 detail-label">Website:</div>
+          <div class="col-sm-9 detail-value">
+            <a href="<%= company.companyDetails.website %>" target="_blank">
+              <%= company.companyDetails.website %>
+            </a>
+          </div>
+        </div>
+        <div class="detail-row row align-items-center">
+          <div class="col-sm-3 detail-label">Registered on Chain:</div>
+          <div class="col-sm-9 detail-value d-flex align-items-center">
+            <span id="registrationStatus">—</span>
+            <button id="checkStatusBtn" class="btn btn-sm btn-secondary ms-3">
+              Check
+            </button>
+          </div>
         </div>
       </div>
+    </div>
 
       <!-- Products Section -->
       <div class="card mb-4">
