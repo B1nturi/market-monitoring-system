@@ -2,6 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
+const ejs = require('ejs');
+const path = require('path');
 const productMetricsSchema = require('../schemas/productMetricsSchema');
 const userSchema = require('../schemas/userSchema');
 const product = require('../schemas/productSchema');
@@ -15,6 +17,21 @@ const { ethers } = require("ethers");
 const abi = require("../public/json/abi.json");
 const dotenv = require("dotenv");
 dotenv.config();
+
+
+const nodemailer = require('nodemailer');
+const Mail = require('nodemailer/lib/mailer');
+
+// configure your SMTP transporter (install nodemailer and set env vars)
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST, // e.g., mail.yourdomain.com or smtp.hostinger.com
+  port: 25, // 587 for TLS, 465 for SSL
+  secure: false, // true for port 465, false for 587
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+});
 
 // Assuming you've already created a model for company data.
 const ProductMetrics = mongoose.model('ProductMetric', productMetricsSchema);
@@ -224,25 +241,70 @@ router.get('/complaints', authenticateCompany, async (req, res) => {
 });
 
 // submit a complaint response (Company only)
+// router.post('/respond/:id', authenticateCompany, async (req, res) => {
+//   try {
+//     const complaintId = req.params.id;
+//     const { response, status } = req.body;
+
+//     // Update the complaint with the company's response and status
+//     const updatedComplaint = await Complaint.findByIdAndUpdate(
+//       complaintId,
+//       { companyResponse: response, status },
+//       { new: true }
+//     );
+
+//     if (!updatedComplaint) {
+//       return res.status(404).json({ error: 'Complaint not found' });
+//     }
+
+//     res.redirect('/company/complaints'); // Redirect back to the complaints page
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: 'Error while responding to the complaint' });
+//   }
+// });
+
 router.post('/respond/:id', authenticateCompany, async (req, res) => {
   try {
     const complaintId = req.params.id;
     const { response, status } = req.body;
 
-    // Update the complaint with the company's response and status
-    const updatedComplaint = await Complaint.findByIdAndUpdate(
-      complaintId,
-      { companyResponse: response, status },
-      { new: true }
-    );
+    // Update the complaint and populate consumer’s email
+    const updatedComplaint = await Complaint
+      .findByIdAndUpdate(
+        complaintId,
+        { companyResponse: response, status },
+        { new: true }
+      )
+      .populate('consumerId', 'name email');
 
     if (!updatedComplaint) {
       return res.status(404).json({ error: 'Complaint not found' });
     }
 
-    res.redirect('/company/complaints'); // Redirect back to the complaints page
+    // send notification email to the consumer
+    const { email, name } = updatedComplaint.consumerId;
+    const html = await ejs.renderFile(
+      path.join(__dirname, '../views/email/complaintResponse.ejs'),
+      {
+        name,
+        title: updatedComplaint.title,
+        status: updatedComplaint.status,
+        response: updatedComplaint.companyResponse
+      }
+    );
+
+    const mailOptions = {
+      from: process.env.SMTP_FROM,
+      to: email,
+      subject: `Response to your complaint: ${updatedComplaint.title}`,
+      html     // our rendered EJS
+    };
+    await transporter.sendMail(mailOptions);
+
+    res.redirect('/company/complaints');
   } catch (err) {
-    console.error(err);
+    console.error('Error responding to complaint:', err);
     res.status(500).json({ error: 'Error while responding to the complaint' });
   }
 });
@@ -316,6 +378,12 @@ router.get('/productmetrics', authenticateCompany, async (req, res, next) => {
     next(err);
   }
 });
+
+// router.get('/email', authenticateCompany, async (req, res) => {
+//   res.render('email/complaintResponse', {
+//     title: 'Send Complaint Email',
+//     message: 'Please fill in the details below to send a complaint email.'
+//   });
 
 
 // export the router

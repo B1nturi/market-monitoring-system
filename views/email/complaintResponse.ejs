@@ -1,0 +1,98 @@
+<div style="
+      font-family: Arial, sans-serif;
+      color: #333;
+      line-height: 1.5;
+      max-width: 600px;
+      margin: auto;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      overflow: hidden;
+      padding: 16px; 
+    ">
+  <header style="
+        background: #000000;
+        color: white;
+        padding: 16px;
+        text-align: center;
+      ">
+    <h1 style="margin: 0; font-size: 24px;">
+      Market Monitoring System
+    </h1>
+  </header>
+
+  <main style="padding: 20px;">
+    <p>Hi <strong><%= name %></strong>,</p>
+    <p>
+      Your complaint <em>"<%= title %>"</em> has been responded by the company.
+    </p>
+
+    <table style="
+          width: 100%;
+          border-collapse: collapse;
+          margin: 16px 0;
+        ">
+      <tr>
+        <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">
+          Status
+        </td>
+        <td style="padding: 8px; border: 1px solid #ddd;">
+          <%= status %>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">
+          Response
+        </td>
+        <td style="padding: 8px; border: 1px solid #ddd;">
+          <%= response %>
+        </td>
+      </tr>
+    </table>
+    <p>
+      You can view the details of your complaint and the company's response
+      by clicking this link:
+      <a href="" style="
+            color: #4a90e2;
+            text-decoration: none;
+          ">
+        View Complaint</a>
+    </p>
+    <p>
+      Thank you for your patience. If you have any further questions,
+      feel free to reply to this email.
+    </p>
+  </main>
+
+  <footer style="
+        background: #f2f2f2;
+        color: #555;
+        text-align: center;
+        padding: 12px;
+        font-size: 12px;
+      ">
+    &copy; <%= new Date().getFullYear() %> Market Monitoring System<br/>
+    <a href="" style="color: #4a90e2; text-decoration: none;">
+      Visit our website
+    </a>
+    <div style="margin:12px 0; text-align:center;">
+      <a href="https://facebook.com/" style="margin:0 5px;">
+        <img src="https://cdn-icons-png.flaticon.com/24/733/733547.png" alt="Facebook" width="24" height="24"/>
+      </a>
+      
+      <a href="https://instagram.com/" style="margin:0 5px;">
+        <img src="https://cdn-icons-png.flaticon.com/24/2111/2111463.png" alt="Instagram" width="24" height="24"/>
+        <a href="https://wa.me/" style="margin:0 5px;">
+        <img src="https://cdn-icons-png.flaticon.com/24/733/733585.png" alt="WhatsApp" width="24" height="24"/>
+      </a>
+      </a>
+    </div>
+    <div style="text-align:center; font-size:12px; color:#777; margin-bottom:8px;">
+      <a href="" style="color:#4a90e2; text-decoration:none; margin:0 5px;">
+        Privacy Policy
+      </a> |
+      <a href="" style="color:#4a90e2; text-decoration:none; margin:0 5px;">
+        Terms of Use
+      </a>
+    </div>
+  </footer>
+</div>
