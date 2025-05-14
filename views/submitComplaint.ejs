@@ -1,161 +1,195 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Submit Complaint</title>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
     <!-- Bootstrap CSS -->
-    <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
     <style>
-        html,
-        body {
-            height: 100%;
-            font-family: 'Roboto', sans-serif;
-        }
+      html,
+      body {
+        height: 100%;
+        font-family: "Roboto", sans-serif;
+      }
 
-        body {
-            display: flex;
-            flex-direction: column;
-            background: linear-gradient(135deg, #edf2f7, #e2e8f0);
-        }
+      body {
+        display: flex;
+        flex-direction: column;
+        background: linear-gradient(135deg, #edf2f7, #e2e8f0);
+      }
 
+      .form-container {
+        max-width: 100%;
+        width: 100%;
+        max-width: 700px;
+        margin: auto;
+        background: linear-gradient(135deg, #ffffff, #f9fafb);
+        padding: 3rem;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+      }
+
+      .form-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        color: #1f2937;
+      }
+
+      label {
+        font-size: 1rem;
+        font-weight: 500;
+        color: #4a5568;
+      }
+
+      .form-control,
+      .form-select {
+        font-size: 0.95rem;
+        border: 1px solid #cbd5e0;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+      }
+
+      .form-control:focus,
+      .form-select:focus {
+        border-color: #3182ce;
+        box-shadow: 0 0 8px rgba(49, 130, 206, 0.5);
+      }
+
+      .btn-primary {
+        background-color: #3182ce;
+        border: none;
+        border-radius: 10px;
+        padding: 12px 20px;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        color: white;
+      }
+
+      .btn-primary:hover {
+        background-color: #2b6cb0;
+        transform: translateY(-2px);
+      }
+
+      .btn-secondary {
+        background-color: #718096;
+        border: none;
+        border-radius: 10px;
+        padding: 12px 20px;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        color: white;
+      }
+
+      .btn-secondary:hover {
+        background-color: #4a5568;
+        transform: translateY(-2px);
+      }
+
+      @media (max-width: 576px) {
         .form-container {
-            max-width: 100%;
-            width: 100%;
-            max-width: 700px;
-            margin: auto;
-            background: linear-gradient(135deg, #ffffff, #f9fafb);
-            padding: 3rem;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e5e7eb;
+          padding: 1.5rem;
         }
 
         .form-title {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            text-align: center;
-            color: #1f2937;
+          font-size: 1.8rem;
         }
 
         label {
-            font-size: 1rem;
-            font-weight: 500;
-            color: #4a5568;
+          font-size: 0.9rem;
         }
 
-        .form-control,
-        .form-select {
-            font-size: 0.95rem;
-            border: 1px solid #cbd5e0;
-            border-radius: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .form-control:focus,
-        .form-select:focus {
-            border-color: #3182ce;
-            box-shadow: 0 0 8px rgba(49, 130, 206, 0.5);
-        }
-
-        .btn-primary {
-            background-color: #3182ce;
-            border: none;
-            border-radius: 10px;
-            padding: 12px 20px;
-            font-size: 1rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: #2b6cb0;
-            transform: translateY(-2px);
-        }
-
+        .btn-primary,
         .btn-secondary {
-            background-color: #718096;
-            border: none;
-            border-radius: 10px;
-            padding: 12px 20px;
-            font-size: 1rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            color: white;
+          font-size: 0.9rem;
         }
-
-        .btn-secondary:hover {
-            background-color: #4a5568;
-            transform: translateY(-2px);
-        }
-
-        @media (max-width: 576px) {
-            .form-container {
-                padding: 1.5rem;
-            }
-
-            .form-title {
-                font-size: 1.8rem;
-            }
-
-            label {
-                font-size: 0.9rem;
-            }
-
-            .btn-primary,
-            .btn-secondary {
-                font-size: 0.9rem;
-            }
-        }
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
     <%- include('partials/header') %>
 
-    <div class="container d-flex align-items-center justify-content-center mt-5">
-        <div class="form-container">
-            <h1 class="form-title">Submit Complaint</h1>
+    <div
+      class="container d-flex align-items-center justify-content-center mt-5"
+    >
+      <div class="form-container">
+        <h1 class="form-title">Submit Complaint</h1>
 
-            <form action="/consumer/submit-complaint" method="POST">
-                <input type="hidden" id="consumerId" name="consumerId" value="<%= consumerId %>">
+        <form action="/consumer/submit-complaint" method="POST">
+          <input
+            type="hidden"
+            id="consumerId"
+            name="consumerId"
+            value="<%= consumerId %>"
+          />
 
-                <div class="mb-3">
-                    <label for="companyId" class="form-label">Company:</label>
-                    <select id="companyId" name="companyId" class="form-select" required>
-                        <% companies.forEach(company => { %>
-                            <option value="<%= company.userId %>">
-                                <%= company._id %>
-                            </option>
-                        <% }); %>
-                    </select>
-                </div>
+          <div class="mb-3">
+            <label for="companyId" class="form-label">Company:</label>
+            <select
+              id="companyId"
+              name="companyId"
+              class="form-select"
+              required
+            >
+              <% companies.forEach(company => { %>
+              <option value="<%= company.userId %>"><%= company._id %></option>
+              <% }); %>
+            </select>
+          </div>
 
-                <div class="mb-3">
-                    <label for="title" class="form-label">Title:</label>
-                    <input type="text" id="title" name="title" class="form-control" placeholder="Enter complaint title" required>
-                </div>
+          <div class="mb-3">
+            <label for="title" class="form-label">Complaint title:</label>
+            <select id="title" name="title" class="form-select" required>
+              <option value="" disabled selected>Select complaint Title</option>
+              <option value="Price Hike">Price Hike</option>
+              <option value="Quality Issue">Quality Issue</option>
+              <option value="Delivery Delay">Delivery Delay</option>
+              <option value="Market Manipulation">Market Manipulation</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
 
-                <div class="mb-3">
-                    <label for="description" class="form-label">Description:</label>
-                    <textarea id="description" name="description" class="form-control" rows="4" placeholder="Describe your complaint" required></textarea>
-                </div>
+          <div class="mb-3">
+            <label for="description" class="form-label">Description:</label>
+            <textarea
+              id="description"
+              name="description"
+              class="form-control"
+              rows="4"
+              placeholder="Describe your complaint"
+              required
+            ></textarea>
+          </div>
 
-                <div class="d-flex flex-column flex-sm-row justify-content-between gap-2">
-                    <button type="submit" class="btn btn-primary w-sm-auto">Submit </button>
-                    <button type="button" class="btn btn-secondary w-sm-auto" onclick="window.history.back();">Cancel</button>
-
-                </div>
-            </form>
-        </div>
+          <div
+            class="d-flex flex-column flex-sm-row justify-content-between gap-2"
+          >
+            <button type="submit" class="btn btn-primary w-sm-auto">
+              Submit
+            </button>
+            <button
+              type="button"
+              class="btn btn-secondary w-sm-auto"
+              onclick="window.history.back();"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
 
     <%- include('partials/footer') %>
-</body>
-
+  </body>
 </html>

@@ -1,155 +1,193 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Stock</title>
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
-    <style>
-        .dropdown-menu {
-            max-height: 200px;
-            overflow-y: auto;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Product Stock</title>
+  <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+  <style>
+    html,
+      body {
+        height: 100%;
+      }
+      body {
+        display: flex;
+        flex-direction: column;
+      }
+      main {
+        flex: 1;
+      }
+    .dropdown-menu { max-height: 200px; overflow-y: auto; }
+    .company-link { cursor: pointer; color: #0d6efd; text-decoration: underline; }
+  </style>
 </head>
-
 <body>
-    <%- include('partials/adminHeader') %>
-    <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <div class="container mt-5">
-        <h1 class="text-center mb-4">Product Stock</h1>
+  <%- include('partials/adminHeader') %>
 
-        <!-- Search and Dropdown -->
-        <div class="mb-4">
-            <label for="productSearch" class="form-label">Search Product:</label>
-            <div class="input-group">
-                <input type="text" id="productSearch" class="form-control" placeholder="Type product name...">
-                <button class="btn btn-primary" id="searchButton">Search</button>
-            </div>
-            <ul class="dropdown-menu mt-2" id="productDropdown1"></ul>
-            <script>
-                document.getElementById('searchButton').addEventListener('click', async () => {
-                    const query = document.getElementById('productSearch').value.trim();
-                    if (query) {
-                        // Fetch stock details for the entered product name
-                        await fetchStockDetails(query);
-                    }
-                });
-            </script>
-        </div>
+  <div class="container mt-5">
+    <h1 class="text-center mb-4">Product Stock</h1>
 
-        <!-- Similar Products Section -->
-        <div id="similarProducts" class="mt-4 d-none">
-            <h3>Product Stock Details</h3>
-            <table class="table table-bordered">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Company Name</th>
-                        <th>Company Address</th>
-                        <th>Company Email</th>
-                        <th>Product Name</th>
-                        <th>Quantity</th>
-                    </tr>
-                </thead>
-                <tbody id="similarProductsTableBody">
-                    <!-- Similar products will be dynamically added here -->
-                </tbody>
-            </table>
-            <p id="noSimilarProducts" class="text-muted d-none">No products found.</p>
-        </div>
+    <!-- Search and Dropdown -->
+    <div class="mb-4">
+      <label for="productSearch" class="form-label">Search Product:</label>
+      <div class="input-group">
+        <input type="text" id="productSearch" class="form-control" placeholder="Type product name...">
+        <button class="btn btn-primary" id="searchButton">Search</button>
+      </div>
+      <ul class="dropdown-menu mt-2" id="productDropdown1"></ul>
     </div>
 
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script>
-        const productSearch = document.getElementById('productSearch');
-        const productDropdown = document.getElementById('productDropdown1');
-        const similarProductsElement = document.getElementById('similarProducts');
-        const similarProductsTableBody = document.getElementById('similarProductsTableBody');
-        const noSimilarProducts = document.getElementById('noSimilarProducts');
+    <!-- Similar Products Section -->
+    <div id="similarProducts" class="mt-4 d-none">
+      <h3>Product Stock Details</h3>
+      <table class="table table-bordered">
+        <thead class="table-dark">
+          <tr>
+            <th>Product Name</th>
+            <th>Company Name</th>
+            <!-- <th>Company Address</th>
+            <th>Company Email</th> -->
+            <th>Quantity</th>
+          </tr>
+        </thead>
+        <tbody id="similarProductsTableBody">
+          <!-- dynamically inserted rows + total -->
+        </tbody>
+      </table>
+      <p id="noSimilarProducts" class="text-muted d-none">No products found.</p>
+    </div>
+  </div>
 
-        productSearch.addEventListener('input', async () => {
-            const query = productSearch.value.trim();
-            if (query.length === 0) {
-                productDropdown.innerHTML = '';
-                productDropdown.classList.remove('show');
-                return;
-            }
+  <!-- Company Details Modal -->
+  <div class="modal fade" id="companyModal" tabindex="-1" aria-labelledby="companyModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="companyModalLabel">Company Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p><strong>Name:</strong> <span id="modalCompanyName"></span></p>
+          <p><strong>Address:</strong> <span id="modalCompanyAddress"></span></p>
+          <p><strong>Email:</strong> <span id="modalCompanyEmail"></span></p>
+        </div>
+      </div>
+    </div>
+  </div>
 
-            // Fetch matching product names from the server
-            const response = await fetch(`/product/search?query=${query}`);
-            const products = await response.json();
+  <%- include('partials/footer') %>
+  <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+  <script>
+    const productSearch = document.getElementById('productSearch');
+    const productDropdown = document.getElementById('productDropdown1');
+    const similarProductsElement = document.getElementById('similarProducts');
+    const similarProductsTableBody = document.getElementById('similarProductsTableBody');
+    const noSimilarProducts = document.getElementById('noSimilarProducts');
+    const searchButton = document.getElementById('searchButton');
 
-            // Populate the dropdown
-            productDropdown.innerHTML = '';
-            products.forEach(product => {
-                const li = document.createElement('li');
-                li.classList.add('dropdown-item');
-                li.textContent = product.productName;
-                li.addEventListener('click', () => fetchStockDetails(product.productName));
-                productDropdown.appendChild(li);
-            });
-            productDropdown.classList.add('show');
+    // show dropdown items on typing
+    productSearch.addEventListener('input', async () => {
+      const query = productSearch.value.trim();
+      if (!query) {
+        productDropdown.innerHTML = '';
+        productDropdown.classList.remove('show');
+        return;
+      }
+      const resp = await fetch(`/product/search?query=${encodeURIComponent(query)}`);
+      const products = await resp.json();
+      productDropdown.innerHTML = '';
+      products.forEach(p => {
+        const li = document.createElement('li');
+        li.classList.add('dropdown-item');
+        li.textContent = p.productName;
+        li.addEventListener('click', () => fetchStockDetails(p.productName));
+        productDropdown.appendChild(li);
+      });
+      productDropdown.classList.add('show');
+    });
+
+    // search button click
+    searchButton.addEventListener('click', () => {
+      const q = productSearch.value.trim();
+      if (q) fetchStockDetails(q);
+    });
+
+    async function fetchStockDetails(productName) {
+      productSearch.value = productName;
+      productDropdown.classList.remove('show');
+
+      const resp = await fetch(`/product/stock/${encodeURIComponent(productName)}`);
+      const data = await resp.json();
+      if (data.error) {
+        alert(data.error);
+        return;
+      }
+
+      const items = data.similarProducts || [];
+      if (items.length > 0) {
+        // group and tally quantities
+        const grouped = items.reduce((acc, it) => {
+          const key = `${it.companyName}|${it.companyAddress}|${it.companyEmail}`;
+          acc[key] = acc[key] || {};
+          acc[key][it.productName] = (acc[key][it.productName] || 0) + it.quantity;
+          return acc;
+        }, {});
+
+        // build rows and compute total
+        let totalQty = 0;
+        const rows = Object.entries(grouped).map(([key, prods]) => {
+          const [companyName, companyAddress, companyEmail] = key.split('|');
+          return Object.entries(prods).map(([prodName, qty]) => {
+            totalQty += qty;
+            return `
+              <tr>
+                <td>${prodName}</td>
+                <td>
+                  <a href="#" class="company-link"
+                     data-name="${companyName}"
+                     data-address="${companyAddress}"
+                     data-email="${companyEmail}">
+                    ${companyName}
+                  </a>
+                </td>
+                
+                <td>${qty}</td>
+              </tr>
+            `;
+          }).join('');
+        }).join('');
+
+        // footer row for total
+        const totalRow = `
+          <tr class="table-secondary">
+            <td colspan="2" class="text-end fw-bold">Total Quantity</td>
+            <td class="fw-bold">${totalQty}</td>
+          </tr>
+        `;
+
+        similarProductsTableBody.innerHTML = rows + totalRow;
+        similarProductsElement.classList.remove('d-none');
+        noSimilarProducts.classList.add('d-none');
+
+        // attach click handlers to open modal
+        document.querySelectorAll('.company-link').forEach(link => {
+          link.addEventListener('click', e => {
+            e.preventDefault();
+            document.getElementById('modalCompanyName').textContent = link.dataset.name;
+            document.getElementById('modalCompanyAddress').textContent = link.dataset.address;
+            document.getElementById('modalCompanyEmail').textContent = link.dataset.email;
+            const companyModal = new bootstrap.Modal(document.getElementById('companyModal'));
+            companyModal.show();
+          });
         });
 
-        async function fetchStockDetails(productName) {
-            productSearch.value = productName;
-            productDropdown.classList.remove('show');
-
-            // Fetch stock details for the selected product
-            const response = await fetch(`/product/stock/${productName}`);
-            const data = await response.json();
-
-            if (data.error) {
-                alert(data.error);
-                return;
-            }
-
-            // Display similar products in a table
-            if (data.similarProducts && data.similarProducts.length > 0) {
-                // Group products by company name, address, email, and product name
-                const groupedData = data.similarProducts.reduce((acc, product) => {
-                    const companyKey = `${product.companyName}|${product.companyAddress}|${product.companyEmail}`;
-                    if (!acc[companyKey]) {
-                        acc[companyKey] = {};
-                    }
-                    if (!acc[companyKey][product.productName]) {
-                        acc[companyKey][product.productName] = 0;
-                    }
-                    acc[companyKey][product.productName] += product.quantity;
-                    return acc;
-                }, {});
-
-                // Generate table rows for grouped data
-                similarProductsTableBody.innerHTML = Object.entries(groupedData)
-                    .map(([companyKey, products]) => {
-                        const [companyName, companyAddress, companyEmail] = companyKey.split('|');
-                        const productRows = Object.entries(products)
-                            .map(([productName, quantity]) => `
-                                <tr>
-                                    <td>${companyName}</td>
-                                    <td>${companyAddress}</td>
-                                    <td>${companyEmail}</td>
-                                    <td>${productName}</td>
-                                    <td>${quantity}</td>
-                                </tr>
-                            `)
-                            .join('');
-                        return productRows;
-                    })
-                    .join('');
-
-                similarProductsElement.classList.remove('d-none');
-                noSimilarProducts.classList.add('d-none');
-            } else {
-                similarProductsTableBody.innerHTML = '';
-                similarProductsElement.classList.remove('d-none');
-                noSimilarProducts.classList.remove('d-none');
-            }
-        }
-    </script>
+      } else {
+        similarProductsTableBody.innerHTML = '';
+        similarProductsElement.classList.remove('d-none');
+        noSimilarProducts.classList.remove('d-none');
+      }
+    }
+  </script>
 </body>
-
 </html>

@@ -1,204 +1,199 @@
-<!-- 
-  This file is part of the on chain product metrics page for the Market Monitoring System.
--->
-
-
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Create Product Metrics</title>
   <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css" />
-
-  <!-- Do not delete this script. It is required for the functionality of the page. -->
   <script src="https://cdn.jsdelivr.net/npm/ethers/dist/ethers.umd.min.js"></script>
   <style>
-    html,
-    body {
-      height: 100%;
-    }
-
-    body {
-      display: flex;
-      flex-direction: column;
-    }
-
-    main {
-      flex: 1;
-    }
+    html, body { height: 100%; }
+    body { display: flex; flex-direction: column; }
+    main { flex: 1; }
   </style>
 </head>
-
 <body>
   <%- include('partials/companyHeader') %>
 
-    <main class="container mt-5">
-      <h1 class="text-center mb-4">Create Product Metrics Record</h1>
+  <main class="container mt-5">
+    <h1 class="text-center mb-4">Create Product Metrics Record</h1>
 
-      <form id="metricsForm" action="/company/submit-product" method="POST" class="needs-validation" novalidate>
-        <!-- Hidden fields -->
-        <input type="hidden" name="companyId" value="<%= companyId %>" />
-        <input type="hidden" name="transactionHash" id="txHash" />
-        <input type="hidden" name="productOrigin" id="productOrigin" />
+    <form id="metricsForm"
+          action="/company/submit-product"
+          method="POST"
+          class="needs-validation"
+          novalidate>
 
-        <!-- Product -->
-        <div class="mb-3">
-          <label for="productID" class="form-label">Product:</label>
-          <select id="productID" name="productID" class="form-select" required>
-            <option value="">Select a product</option>
-            <% products.forEach(prod=> { %>
-              <option value="<%= prod.productID %>" data-origin="<%= prod.manufacturer %>">
-                <%= prod.productName %>
-              </option>
-              <% }) %>
-          </select>
-          <div class="invalid-feedback">Please select a product.</div>
+      <!-- Hidden fields -->
+      <input type="hidden" name="companyId" value="<%= companyId %>" />
+      <input type="hidden" name="transactionHash" id="txHash" />
+      <input type="hidden" name="productOrigin" id="productOrigin" />
+
+      <!-- Product -->
+      <div class="mb-3">
+        <label for="productID" class="form-label">Product:</label>
+        <select id="productID"
+                name="productID"
+                class="form-select"
+                required>
+          <option value="">Select a product</option>
+          <% products.forEach(prod => { %>
+            <option value="<%= prod.productID %>"
+                    data-origin="<%= prod.manufacturer %>">
+              <%= prod.productName %> – <%= prod.batchNumber %>
+            </option>
+          <% }) %>
+        </select>
+        <div class="invalid-feedback">Please select a product.</div>
+      </div>
+
+      <!-- To Company -->
+      <div class="mb-3">
+        <label for="toCompany" class="form-label">
+          To Company / Source:
+        </label>
+        <select id="toCompany"
+                name="toCompany"
+                class="form-select"
+                required>
+          <option value="">Select a recipient</option>
+          <% toCompanies.forEach(c => { %>
+            <option value="<%= c.userId %>"
+                    data-wallet="<%= c.walletaddress %>">
+              <%= c.name %> – <%= c.walletaddress %>
+            </option>
+          <% }) %>
+        </select>
+        <div class="invalid-feedback">
+          Please select a company/source.
         </div>
+      </div>
 
-        <!-- To Company -->
-        <div class="mb-3">
-          <label for="toCompany" class="form-label">To Company / Source:</label>
-          <select id="toCompany" name="toCompany" class="form-select" required>
-            <option value="">Select a recipient</option>
-            <% toCompanies.forEach(c=> { %>
-              <option value="<%= c.userId %>" data-wallet="<%= c.walletaddress %>">
-              <%= c.name %>  - <%= c.walletaddress %>
-              </option>
-            <% }) %>
-          </select>
-          <div class="invalid-feedback">
-            Please select a company/source.
-          </div>
+      <!-- Selling Price -->
+      <div class="mb-3">
+        <label for="sellingPrice" class="form-label">
+          Selling Price:
+        </label>
+        <input type="number"
+               id="sellingPrice"
+               name="sellingPrice"
+               class="form-control"
+               step="0.01"
+               required />
+        <div class="invalid-feedback">
+          Enter the selling price.
         </div>
+      </div>
 
-        <!-- Selling Price -->
-        <div class="mb-3">
-          <label for="sellingPrice" class="form-label">Selling Price:</label>
-          <input type="number" id="sellingPrice" name="sellingPrice" class="form-control" step="0.01" required />
-          <div class="invalid-feedback">Enter the selling price.</div>
+      <!-- Quantity Bought -->
+      <div class="mb-3">
+        <label for="quantityBought" class="form-label">
+          Quantity Bought:
+        </label>
+        <input type="number"
+               id="quantityBought"
+               name="quantityBought"
+               class="form-control"
+               required />
+        <div class="invalid-feedback">
+          Enter the quantity bought.
         </div>
+      </div>
 
-        <!-- Quantity Bought -->
-        <div class="mb-3">
-          <label for="quantityBought" class="form-label">Quantity Bought:</label>
-          <input type="number" id="quantityBought" name="quantityBought" class="form-control" required />
-          <div class="invalid-feedback">Enter the quantity bought.</div>
-        </div>
+      <div class="d-flex justify-content-between">
+        <button id="submitBtn"
+                type="submit"
+                class="btn btn-primary">
+          Submit
+        </button>
+        <button type="button"
+                class="btn btn-secondary"
+                onclick="history.back()">
+          Cancel
+        </button>
+      </div>
+    </form>
+  </main>
 
-        <div class="d-flex justify-content-between">
-          <button id="submitBtn" type="button" class="btn btn-primary">
-            Submit
-          </button>
-          <button type="button" class="btn btn-secondary" onclick="history.back()">
-            Cancel
-          </button>
-        </div>
-      </form>
-    </main>
+  <%- include('partials/footer') %>
 
-    <%- include('partials/footer') %>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const contractAddress = "0xCb6DEFdBD93a6ae3149c1149029BB26981919e06";
+      const abi             = <%- JSON.stringify(abi) %>;
+      const form            = document.getElementById("metricsForm");
+      const productSelect   = document.getElementById("productID");
+      const originInput     = document.getElementById("productOrigin");
 
-      <script>
-        (async () => {
-          const contractAddress = "0xCb6DEFdBD93a6ae3149c1149029BB26981919e06";
-          const abi = <% - abi %>;
-          const form = document.getElementById("metricsForm");
-          const submitBtn = document.getElementById("submitBtn");
-          const productSelect = document.getElementById("productID");
-          const originInput = document.getElementById("productOrigin");
+      // sync hidden origin
+      productSelect.addEventListener("change", () => {
+        const opt = productSelect.selectedOptions[0];
+        originInput.value = opt?.dataset.origin || "";
+        console.log("productOrigin:", originInput.value);
+      });
 
-          // update hidden productOrigin on product change
-          productSelect.addEventListener("change", () => {
-            const opt = productSelect.selectedOptions[0];
-            originInput.value = opt?.dataset.origin || "";
-            console.log("productOrigin set to:", originInput.value);
-          });
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        if (!form.checkValidity()) {
+          form.classList.add("was-validated");
+          return;
+        }
 
-          console.log("Form loaded");
-          console.log("Contract Address:", contractAddress);
+        const fd   = new FormData(form);
+        const data = Object.fromEntries(fd.entries());
+        console.group("Form data");
+        Object.entries(data).forEach(([k,v]) => console.log(k, ":", v));
+        console.groupEnd();
 
-          submitBtn.addEventListener("click", async () => {
-            // Bootstrap validation
-            if (!form.checkValidity()) {
-              form.classList.add("was-validated");
-              return;
-            }
+        // get recipient wallet
+        const toWallet = document
+          .getElementById("toCompany")
+          .selectedOptions[0]
+          .dataset.wallet;
 
-            // Collect form data
-            const fd = new FormData(form);
-            const data = Object.fromEntries(fd.entries());
+        if (!ethers.isAddress(contractAddress)) {
+          return alert("Invalid contract address");
+        }
+        if (!ethers.isAddress(toWallet)) {
+          return alert("Invalid recipient address");
+        }
+        if (!window.ethereum) {
+          return alert("MetaMask not found");
+        }
 
-            // Log every field/value
-            console.group("🔍 Form submission data");
-            Object.entries(data).forEach(([k, v]) => console.log(k, ":", v));
-            console.groupEnd();
+        await window.ethereum.request({ method: "eth_requestAccounts" });
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer   = await provider.getSigner();
+        const contract = new ethers.Contract(
+          contractAddress,
+          abi,
+          signer
+        );
 
-            // Grab recipient wallet
-            const toOpt = document
-              .getElementById("toCompany")
-              .selectedOptions[0];
-            const toWallet = toOpt.dataset.wallet;
-            console.log("toWallet:", toWallet);
+        let receipt;
+        try {
+          const tx = await contract.recordProductMetric(
+            data.companyId,
+            data.productID,
+            data.productOrigin,
+            toWallet,
+            data.toCompany,
+            data.sellingPrice,
+            data.quantityBought.toString()
+          );
+          receipt = await tx.wait();
+          if (receipt.status !== 1) {
+            throw new Error("Transaction reverted");
+          }
+        } catch (err) {
+          console.error(err);
+          return alert("Blockchain transaction failed.");
+        }
 
-            if (!ethers.isAddress(contractAddress)) {
-              return alert("Invalid contract address");
-            }
-            if (!ethers.isAddress(toWallet)) {
-              return alert("Invalid recipient address");
-            }
-            if (!window.ethereum) {
-              return alert("MetaMask not found.");
-            }
-
-            await window.ethereum.request({
-              method: "eth_requestAccounts"
-            });
-
-            const provider = new ethers.BrowserProvider(window.ethereum);
-            const signer = await provider.getSigner();
-            const contract = new ethers.Contract(
-              contractAddress,
-              abi,
-              signer
-            );
-
-            // BigNumbers
-            const price =
-              data.sellingPrice
-              ;
-            const qty =
-              data.quantityBought.toString()
-              ;
-
-            let receipt;
-            try {
-              const tx = await contract.recordProductMetric(
-                data.companyId,
-                data.productID,
-                data.productOrigin,
-                toWallet,
-                data.toCompany,
-                price,
-                qty
-              );
-              receipt = await tx.wait();
-              if (receipt.status !== 1) {
-                throw new Error("Transaction reverted");
-              }
-            } catch (err) {
-              console.error(err);
-              return alert("Blockchain transaction failed.");
-            }
-
-            // Write txHash and submit form
-            document.getElementById("txHash").value =
-              receipt.transactionHash;
-            form.submit();
-          });
-        })();
-      </script>
+        document.getElementById("txHash").value = receipt.transactionHash;
+        form.submit();
+      });
+    });
+  </script>
 </body>
-
 </html>

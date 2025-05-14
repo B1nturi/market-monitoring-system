@@ -16,7 +16,7 @@
 
       <!-- Company Details Section -->
       <div class="card mb-4">
-      <div class="card-header">Company Details</div>
+      <div class="card-header text-bg-dark">Company Details</div>
       <div class="card-body">
         <div class="detail-row row">
           <div class="col-sm-3 detail-label">Name:</div>
@@ -34,12 +34,28 @@
             </a>
           </div>
         </div>
+        <div class="detail-row row">
+        <div class="col-sm-3 detail-label">Wallet Address:</div>
+        <div class="col-sm-9 detail-value d-flex align-items-center">
+          <span id="walletAddress"><%= company.companyDetails.walletaddress %></span>
+          <button id="copyWalletBtn" class="btn btn-outline-secondary btn-sm ms-2">
+            Copy
+          </button>
+        </div>
+      </div>
         <div class="detail-row row align-items-center">
           <div class="col-sm-3 detail-label">Registered on Chain:</div>
           <div class="col-sm-9 detail-value d-flex align-items-center">
-            <span id="registrationStatus">—</span>
-            <button id="checkStatusBtn" class="btn btn-sm btn-secondary ms-3">
-              Check
+            <span
+              id="registrationStatus"
+              data-bs-toggle="tooltip"
+              data-bs-placement="top"
+              title="Email us with your wallet address if you are not registered within 5 business day."
+              style="cursor: help;"
+            >—</span>
+            <button id="checkStatusBtn"
+                    class="btn ">
+            
             </button>
           </div>
         </div>
@@ -48,7 +64,7 @@
 
       <!-- Products Section -->
       <div class="card mb-4">
-        <div class="card-header">Products</div>
+        <div class="card-header text-bg-dark">Products</div>
         <div class="card-body">
           <% if (products.length > 0) { %>
           <div class="table-responsive">
@@ -333,7 +349,19 @@
     window.addEventListener("load", () => {
       if (window.ethereum) checkStatus();
     });
-    
+     document.getElementById('copyWalletBtn')
+    .addEventListener('click', () => {
+      const addr = document.getElementById('walletAddress').textContent;
+      navigator.clipboard.writeText(addr)
+        .then(() => alert('Wallet address copied to clipboard'))
+        .catch(() => alert('Failed to copy'));
+    });
+
+    // initialize Bootstrap tooltips
+    const tooltipTriggerList = Array.from(
+      document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    );
+    tooltipTriggerList.forEach(el => new bootstrap.Tooltip(el));
   </script>
   <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>
