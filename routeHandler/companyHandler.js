@@ -81,12 +81,13 @@ router.get('/submit-product', authenticateCompany, async (req, res) => {
   // load all companies (except the current one) with their nested wallet
   const companies = await User
     .find({ role: 'company', _id: { $ne: companyId } })
-    .select('companyDetails.walletaddress')   // pull only the nested field
+    .select('companyDetails.walletaddress companyDetails.name')   // pull walletaddress and name
     .lean();
 
   // map into the shape your EJS expects
   const toCompanies = companies.map(c => ({
     userId: c._id.toString(),
+    name: c.companyDetails.name,
     walletaddress: c.companyDetails.walletaddress
   }));
 
@@ -202,7 +203,7 @@ router.post('/submit-product', authenticateCompany, async (req, res) => {
     const blockchain = req.app.locals.blockchain;
     await blockchain.addBlock(newProductMetrics);
 
-    res.json({ message: 'Saved on-chain & in DB' });
+    res.redirect('/company/dashboard');
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error' });

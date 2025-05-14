@@ -61,7 +61,7 @@ router.post('/submit-complaint', authenticateConsumer, async (req, res) => {
         });
 
         await newComplaint.save();
-        res.status(201).json({ message: 'Complaint submitted successfully' });
+        res.redirect('/consumer/dashboard');
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Error while submitting complaint' });
