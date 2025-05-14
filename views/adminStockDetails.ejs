@@ -16,6 +16,8 @@
 </head>
 
 <body>
+    <%- include('partials/adminHeader') %>
+    <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
     <div class="container mt-5">
         <h1 class="text-center mb-4">Product Stock</h1>
 
@@ -26,7 +28,7 @@
                 <input type="text" id="productSearch" class="form-control" placeholder="Type product name...">
                 <button class="btn btn-primary" id="searchButton">Search</button>
             </div>
-            <ul class="dropdown-menu mt-2" id="productDropdown"></ul>
+            <ul class="dropdown-menu mt-2" id="productDropdown1"></ul>
             <script>
                 document.getElementById('searchButton').addEventListener('click', async () => {
                     const query = document.getElementById('productSearch').value.trim();
@@ -63,7 +65,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script>
         const productSearch = document.getElementById('productSearch');
-        const productDropdown = document.getElementById('productDropdown');
+        const productDropdown = document.getElementById('productDropdown1');
         const similarProductsElement = document.getElementById('similarProducts');
         const similarProductsTableBody = document.getElementById('similarProductsTableBody');
         const noSimilarProducts = document.getElementById('noSimilarProducts');
