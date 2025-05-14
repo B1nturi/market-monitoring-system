@@ -45,7 +45,6 @@ router.get('/login', (req, res) => {
 router.post('/login', async (req, res) => {
     try {
         const user = await User.findOne({ username: req.body.username });
-        //console.log(user);
         if (!user) {
             return res.status(404).render('login', { error: "Authorization failed" });
         }
@@ -67,6 +66,7 @@ router.post('/login', async (req, res) => {
             res.status(401).render('login', { error: "Invalid credentials" });
         }
     } catch (err) {
+        console.error(err);
         res.status(500).render('login', { error: "There was an error while logging in" });
     }
 });
